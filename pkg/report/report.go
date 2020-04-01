@@ -126,6 +126,10 @@ func beautifyText(text string) string {
 		text = text[1:]
 	}
 
+	if text[0] == '*' && text[1] == ':' {
+		text = text[2:]
+	}
+
 	text = strings.TrimSpace(text)
 
 	return text
