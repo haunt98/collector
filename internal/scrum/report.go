@@ -52,7 +52,8 @@ func makeMultiReport(cleanedMessages []slack.Message, cleanedUsers map[string]st
 	for _, msg := range cleanedMessages {
 		var s singleReport
 		var ok bool
-		ok, s.yesterday, s.today, s.problem, s.solution = readReportFromMessage(msg.Text)
+		// ok, s.yesterday, s.today, s.problem, s.solution = readReportFromMessage(msg.Text)
+		ok, s.yesterday, s.today, s.problem, s.solution = betterReportFromMessage(msg.Text)
 		if !ok {
 			continue
 		}
@@ -114,6 +115,20 @@ func readReportFromMessage(text string) (ok bool, yesterday, today, problem, sol
 	today = text[todayIndex+len(todayVie) : problemIndex]
 	problem = text[problemIndex+len(problemVie) : solutionIndex]
 	solution = text[solutionIndex+len(solutionVie):]
+	return
+}
+
+func betterReportFromMessage(text string) (ok bool, yesterday, today, problem, solution string) {
+	consume2 := regexp.MustCompile(`(?is)(?:hom\s+qua)(.+?)(?:hom\s+nay)(.+)`)
+	if !consume2.MatchString(text) {
+		ok = false
+		return
+	}
+
+	subs := consume2.FindStringSubmatch(text)
+	yesterday = subs[1]
+	today = subs[2]
+	ok = true
 	return
 }
 
