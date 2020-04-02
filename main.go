@@ -39,6 +39,8 @@ func main() {
 			}
 		case "summary":
 			ctx.String(http.StatusOK, "got it wait it")
+		default:
+			ctx.String(http.StatusOK, "wrong hole")
 		}
 	})
 
