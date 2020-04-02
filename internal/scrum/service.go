@@ -32,6 +32,8 @@ const (
 	summaryMessage = "Em xin tổng hợp nhẹ :licklick:\n"
 
 	responseInChannel = "in_channel"
+
+	maxLoop = 2
 )
 
 func (s *Service) Handle(ctx *gin.Context) {
@@ -61,18 +63,7 @@ func (s *Service) collect(ctx *gin.Context, payload slack.CommandPayload) {
 func (s *Service) summary(ctx *gin.Context, payload slack.CommandPayload) {
 	ctx.String(http.StatusOK, "")
 
-	conversationHistory, err := s.slackService.GetConversationHistory(s.token, payload.ChannelID)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var botMsg slack.Message
-	for _, msg := range conversationHistory.Messages {
-		if msg.Type == message && msg.Text == collectMessage && msg.BotID == s.botID {
-			botMsg = msg
-			break
-		}
-	}
+	botMsg := s.loopGetHistory(payload, maxLoop)
 
 	conversationReplies, err := s.slackService.GetConversationReplies(s.token, payload.ChannelID, botMsg.TS)
 	if err != nil {
@@ -88,4 +79,24 @@ func (s *Service) summary(ctx *gin.Context, payload slack.CommandPayload) {
 	if err := s.slackService.PostThreadMessageByWebhook(payload.ResponseURL, summaryMessage+reportMsg, responseInChannel); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func (s *Service) loopGetHistory(payload slack.CommandPayload, max int) (result slack.Message) {
+	cursor := ""
+	for i := 0; i < max; i += 1 {
+		conversationHistory, err := s.slackService.GetConversationHistory(s.token, payload.ChannelID, cursor)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		for _, msg := range conversationHistory.Messages {
+			if msg.Type == message && msg.Text == collectMessage && msg.BotID == s.botID {
+				result = msg
+				return
+			}
+		}
+
+		cursor = conversationHistory.ResponseMetadata.NextCursor
+	}
+	return
 }

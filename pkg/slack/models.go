@@ -11,7 +11,12 @@ type WebhookMessageRequest struct {
 }
 
 type MessagesResponse struct {
-	Messages []Message `json:"messages"`
+	Messages         []Message        `json:"messages"`
+	ResponseMetadata ResponseMetadata `json:"response_metadata"`
+}
+
+type ResponseMetadata struct {
+	NextCursor string `json:"next_cursor"`
 }
 
 type Message struct {

@@ -26,9 +26,12 @@ func NewService() *Service {
 	}
 }
 
-func (c *Service) GetConversationHistory(token, channel string) (result MessagesResponse, err error) {
+func (c *Service) GetConversationHistory(token, channel, cursor string) (result MessagesResponse, err error) {
 	url := fmt.Sprintf("%s%s?token=%s&channel=%s",
 		baseURL, conversationsHistoryEndpoint, token, channel)
+	if len(cursor) != 0 {
+		url += fmt.Sprintf("&cursor=%s", cursor)
+	}
 
 	var req *http.Request
 	req, err = http.NewRequest(http.MethodGet, url, nil)
