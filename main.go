@@ -32,7 +32,7 @@ func main() {
 		}
 		log.Printf("CommandPayload: %+v\n", commandPayload)
 
-		switch commandPayload.Command {
+		switch commandPayload.Text {
 		case "collect":
 			if err := s.PostThreadMessageByWebhook(commandPayload.ResponseURL, "update please", "in_channel"); err != nil {
 				log.Fatal(err)
