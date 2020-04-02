@@ -47,7 +47,7 @@ func (s *Service) HandleRoot(ctx *gin.Context) {
 	case summaryCommand:
 		s.summary(ctx, payload)
 	default:
-		ctx.String(http.StatusOK, "")
+		ctx.String(http.StatusOK, wrongCommand)
 	}
 }
 
