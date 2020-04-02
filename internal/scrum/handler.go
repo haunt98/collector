@@ -75,15 +75,21 @@ func (s *Service) summary(ctx *gin.Context, payload slack.CommandPayload) {
 		}
 	}
 
+	log.Println("botMsg", botMsg)
+
 	conversationReplies, err := s.slackService.GetConversationReplies(s.token, payload.ChannelID, botMsg.TS)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	log.Println("conversationReplies", conversationReplies)
+
 	usersList, err := s.slackService.GetUsersList(s.token)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	log.Println("usersList", usersList)
 
 	reportMsg := MakeMessage(conversationReplies.Messages, usersList.Users)
 	if err := s.slackService.PostThreadMessageByWebhook(payload.ResponseURL, summaryMessage+reportMsg, responseInChannel); err != nil {
