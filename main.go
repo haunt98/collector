@@ -12,7 +12,6 @@ import (
 )
 
 func main() {
-	// PORT
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
 		log.Fatal("PORT is empty")
@@ -33,7 +32,7 @@ func main() {
 
 	r := gin.Default()
 	r.POST("/", func(ctx *gin.Context) {
-		var payload CommandPayload
+		var payload slack.CommandPayload
 		if err := ctx.Bind(&payload); err != nil {
 			log.Fatal(err)
 		}
@@ -82,12 +81,4 @@ func main() {
 	if err := r.Run(fmt.Sprintf(":%s", port)); err != nil {
 		log.Fatal(err)
 	}
-}
-
-type CommandPayload struct {
-	Command     string `form:"command"`
-	Text        string `form:"text"`
-	ResponseURL string `form:"response_url"`
-	UserID      string `form:"user_id"`
-	ChannelID   string `form:"channel_id"`
 }

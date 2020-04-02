@@ -45,3 +45,11 @@ type User struct {
 type Profile struct {
 	DisplayName string `json:"display_name"`
 }
+
+type CommandPayload struct {
+	Command     string `form:"command"`
+	Text        string `form:"text"`
+	ResponseURL string `form:"response_url"`
+	UserID      string `form:"user_id"`
+	ChannelID   string `form:"channel_id"`
+}
