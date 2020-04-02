@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
@@ -131,5 +132,42 @@ func (c *Slack) GetUsers() (result UsersResponse, err error) {
 	}
 
 	err = json.Unmarshal(body, &result)
+	return
+}
+
+func (c *Slack) PostThreadMessageByWebhook(webhookURL, text, responseType string) error {
+	msgReq := MessageRequest{
+		Text:         text,
+		ResponseType: responseType,
+	}
+
+	return c.postMessageByWebhook(webhookURL, msgReq)
+}
+
+func (c *Slack) postMessageByWebhook(webhookURL string, msgReq MessageRequest) (err error) {
+	var body []byte
+	body, err = json.Marshal(msgReq)
+	if err != nil {
+		return
+	}
+
+	var req *http.Request
+	req, err = http.NewRequest(http.MethodPost, webhookURL, bytes.NewBuffer(body))
+	if err != nil {
+		return
+	}
+
+	var rsp *http.Response
+	rsp, err = c.client.Do(req)
+	if err != nil {
+		return
+	}
+
+	body, err = ioutil.ReadAll(rsp.Body)
+	if err != nil {
+		return
+	}
+
+	log.Fatal(string(body))
 	return
 }

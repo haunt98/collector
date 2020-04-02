@@ -1,9 +1,14 @@
 package slack
 
 type MessageRequest struct {
-	Channel  string `json:"channel"`
-	Text     string `json:"text"`
-	ThreadTS string `json:"thread_ts"`
+	Text string `json:"text,omitempty"`
+
+	// Normally
+	Channel  string `json:"channel,omitempty"`
+	ThreadTS string `json:"thread_ts,omitempty"`
+
+	// Webhook
+	ResponseType string `json:"response_type,omitempty"`
 }
 
 type MessageResponse struct {
