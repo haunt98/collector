@@ -25,7 +25,7 @@ func NewService(slackService *slack.Service, token, botID string) *Service {
 const (
 	collectCommand = "collect"
 	summaryCommand = "summary"
-	wrongCommand   = "sai câu lệnh rồi anh ơi"
+	wrongCommand   = "Sai câu lệnh rồi anh ơi"
 
 	message        = "message"
 	collectMessage = "Update công việc tại đây nha mấy anh ơi :licklick:"
