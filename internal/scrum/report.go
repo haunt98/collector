@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func MakeMessage(messages []slack.Message, users []slack.User) string {
+func makeMessage(messages []slack.Message, users []slack.User) string {
 	cleanedUsers := cleanUsers(users)
 	cleanedMessages := cleanMessages(messages, cleanedUsers)
 
