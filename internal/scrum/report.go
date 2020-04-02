@@ -119,6 +119,11 @@ func readReportFromMessage(text string) (ok bool, yesterday, today, problem, sol
 }
 
 func betterReportFromMessage(text string) (ok bool, yesterday, today, problem, solution string) {
+	ok, yesterday, today, problem, solution = consume4(text)
+	if ok {
+		return
+	}
+
 	ok, yesterday, today, problem, solution = consume3(text)
 	if ok {
 		return
@@ -133,6 +138,22 @@ func betterReportFromMessage(text string) (ok bool, yesterday, today, problem, s
 	return
 }
 
+func consume4(text string) (ok bool, yesterday, today, problem, solution string) {
+	regex := regexp.MustCompile(`(?is)(?:hom\s+qua|hom\s+kia|hom\s+bua|hom\s+truoc|tuan\s+qua|tuan\s+truoc|tuan\s+kia)(.+?)(?:hom\s+nay)(.+?)(?:kho\s+khan|van\s+de)(.+?)(?:giai\s+phap|giai\s+quyet)(.+)`)
+	if !regex.MatchString(text) {
+		ok = false
+		return
+	}
+
+	subs := regex.FindStringSubmatch(text)
+	yesterday = subs[1]
+	today = subs[2]
+	problem = subs[3]
+	solution = subs[4]
+	ok = true
+	return
+}
+
 func consume3(text string) (ok bool, yesterday, today, problem, solution string) {
 	regex := regexp.MustCompile(`(?is)(?:hom\s+qua|hom\s+kia|hom\s+bua|hom\s+truoc|tuan\s+qua|tuan\s+truoc|tuan\s+kia)(.+?)(?:hom\s+nay)(.+?)(?:kho\s+khan|van\s+de)(.+)`)
 	if !regex.MatchString(text) {
@@ -143,6 +164,7 @@ func consume3(text string) (ok bool, yesterday, today, problem, solution string)
 	subs := regex.FindStringSubmatch(text)
 	yesterday = subs[1]
 	today = subs[2]
+	problem = subs[3]
 	ok = true
 	return
 }
