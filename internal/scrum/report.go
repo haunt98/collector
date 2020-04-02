@@ -119,7 +119,7 @@ func readReportFromMessage(text string) (ok bool, yesterday, today, problem, sol
 }
 
 func betterReportFromMessage(text string) (ok bool, yesterday, today, problem, solution string) {
-	consume2 := regexp.MustCompile(`(?is)(?:hom\s+qua)(.+?)(?:hom\s+nay)(.+)`)
+	consume2 := regexp.MustCompile(`(?is)(?:hom\s+qua|hom\s+kia|hom\s+bua|hom\s+truoc|tuan\s+qua|tuan\s+truoc|tuan\s+kia)(.+?)(?:hom\s+nay)(.+)`)
 	if !consume2.MatchString(text) {
 		ok = false
 		return
