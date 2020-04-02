@@ -29,7 +29,7 @@ const (
 
 	message        = "message"
 	collectMessage = "Update công việc tại đây nha mấy anh ơi :licklick:"
-	summaryMessage = "Em xin tổng hợp nhẹ :licklick:\n"
+	summaryMessage = "Em xin tổng hợp nhẹ :licklick:, copy rồi quăng qua wiki confluence nha mấy anh :licklick:\n"
 
 	responseInChannel = "in_channel"
 
