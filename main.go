@@ -32,9 +32,6 @@ func main() {
 	s := slack.NewSlack(token)
 
 	r := gin.Default()
-	r.GET("/ping", func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "ping")
-	})
 	r.POST("/", func(ctx *gin.Context) {
 		var payload CommandPayload
 		if err := ctx.Bind(&payload); err != nil {
@@ -48,7 +45,7 @@ func main() {
 				log.Fatal(err)
 			}
 		case "summary":
-			ctx.String(http.StatusOK, "got it wait it")
+			ctx.String(http.StatusOK, "")
 
 			history, err := s.GetChannelHistory(payload.ChannelID)
 			if err != nil {
