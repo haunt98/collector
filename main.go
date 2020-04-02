@@ -22,14 +22,23 @@ func main() {
 	r.GET("/ping", func(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "ping")
 	})
-	r.POST("/collect", func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "collect")
-	})
-	r.POST("/summary", func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "summary")
+	r.POST("/", func(ctx *gin.Context) {
+		var commandPayload CommandPayload
+		if err := ctx.Bind(&commandPayload); err != nil {
+			log.Fatal(err)
+		}
+		log.Println(commandPayload)
+		ctx.String(http.StatusOK, "<3")
 	})
 
 	if err := r.Run(fmt.Sprintf(":%s", port)); err != nil {
 		log.Fatal(err)
 	}
+}
+
+type CommandPayload struct {
+	Command     string `form:"command"`
+	Text        string `form:"text"`
+	ResponseURL string `form:"response_url"`
+	ChannelID   string `form:"channel_id"`
 }
