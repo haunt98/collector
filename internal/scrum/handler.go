@@ -34,7 +34,7 @@ const (
 	responseInChannel = "in_channel"
 )
 
-func (s *Service) HandleRoot(ctx *gin.Context) {
+func (s *Service) Handle(ctx *gin.Context) {
 	var payload slack.CommandPayload
 	if err := ctx.Bind(&payload); err != nil {
 		log.Fatal(err)

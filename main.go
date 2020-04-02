@@ -5,6 +5,7 @@ import (
 	"collector/pkg/slack"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -27,11 +28,14 @@ func main() {
 		log.Fatal("BOT_ID is empty")
 	}
 
-	slackService := slack.NewService(token)
-	h := scrum.NewService(slackService, token, botID)
+	slackService := slack.NewService()
+	scrumService := scrum.NewService(slackService, token, botID)
 	r := gin.Default()
 
-	r.POST("/", h.HandleRoot)
+	r.POST("/scrum", scrumService.Handle)
+	r.GET("/ping", func(ctx *gin.Context) {
+		ctx.String(http.StatusOK, "pong")
+	})
 
 	if err := r.Run(fmt.Sprintf(":%s", port)); err != nil {
 		log.Fatal(err)

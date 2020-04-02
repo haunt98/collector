@@ -20,7 +20,7 @@ const (
 	usersListEndpoint            = "users.list"
 )
 
-func NewService(token string) *Service {
+func NewService() *Service {
 	return &Service{
 		client: &http.Client{},
 	}
@@ -54,7 +54,7 @@ func (c *Service) GetConversationHistory(token, channel string) (result Messages
 
 func (c *Service) GetConversationReplies(token, channel, threadTS string) (result MessagesResponse, err error) {
 	url := fmt.Sprintf("%s%s?token=%s&channel=%s&ts=%s",
-		baseURL, conversationsRepliesEndpoint, channel, threadTS)
+		baseURL, conversationsRepliesEndpoint, token, channel, threadTS)
 
 	var req *http.Request
 	req, err = http.NewRequest(http.MethodGet, url, nil)
