@@ -63,7 +63,7 @@ func (s *Service) collect(ctx *gin.Context, payload slack.CommandPayload) {
 func (s *Service) summary(ctx *gin.Context, payload slack.CommandPayload) {
 	ctx.String(http.StatusOK, "")
 
-	botMsg := s.loopGetHistory(payload, maxLoop)
+	botMsg := s.loopGetHistoryUntil(payload, maxLoop)
 
 	conversationReplies, err := s.slackService.GetConversationReplies(s.token, payload.ChannelID, botMsg.TS)
 	if err != nil {
@@ -81,7 +81,7 @@ func (s *Service) summary(ctx *gin.Context, payload slack.CommandPayload) {
 	}
 }
 
-func (s *Service) loopGetHistory(payload slack.CommandPayload, max int) (result slack.Message) {
+func (s *Service) loopGetHistoryUntil(payload slack.CommandPayload, max int) (result slack.Message) {
 	cursor := ""
 	for i := 0; i < max; i += 1 {
 		conversationHistory, err := s.slackService.GetConversationHistory(s.token, payload.ChannelID, cursor)
