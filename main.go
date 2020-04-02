@@ -1,11 +1,10 @@
 package main
 
 import (
-	"collector/pkg/report"
+	"collector/internal/scrum"
 	"collector/pkg/slack"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -28,55 +27,11 @@ func main() {
 		log.Fatal("BOT_ID is empty")
 	}
 
-	s := slack.NewSlack(token)
-
+	slackService := slack.NewService(token)
+	h := scrum.NewService(slackService, token, botID)
 	r := gin.Default()
-	r.POST("/", func(ctx *gin.Context) {
-		var payload slack.CommandPayload
-		if err := ctx.Bind(&payload); err != nil {
-			log.Fatal(err)
-		}
-		log.Printf("CommandPayload: %+v\n", payload)
 
-		switch payload.Text {
-		case "collect":
-			if err := s.PostThreadMessageByWebhook(payload.ResponseURL, "update please", "in_channel"); err != nil {
-				log.Fatal(err)
-			}
-		case "summary":
-			ctx.String(http.StatusOK, "")
-
-			history, err := s.GetChannelHistory(payload.ChannelID)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			var botMsg slack.Message
-			for _, msg := range history.Messages {
-				if msg.Type == "message" && msg.Text == "update please" && msg.BotID == botID {
-					botMsg = msg
-					break
-				}
-			}
-
-			threadMessages, err := s.GetThreadMessages(payload.ChannelID, botMsg.TS)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			users, err := s.GetUsers()
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			reportMsg := report.MakeMessage(threadMessages.Messages, users.Users)
-			if err := s.PostThreadMessageByWebhook(payload.ResponseURL, reportMsg, "in_channel"); err != nil {
-				log.Fatal(err)
-			}
-		default:
-			ctx.String(http.StatusOK, "wrong hole")
-		}
-	})
+	r.POST("/", h.HandleRoot)
 
 	if err := r.Run(fmt.Sprintf(":%s", port)); err != nil {
 		log.Fatal(err)

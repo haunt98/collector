@@ -2,18 +2,12 @@ package slack
 
 type MessageRequest struct {
 	Text string `json:"text,omitempty"`
-
-	// Normally
-	Channel  string `json:"channel,omitempty"`
-	ThreadTS string `json:"thread_ts,omitempty"`
-
-	// Webhook
-	ResponseType string `json:"response_type,omitempty"`
 }
 
-type MessageResponse struct {
-	TS      string  `json:"ts"`
-	Message Message `json:"message"`
+type WebhookMessageRequest struct {
+	MessageRequest
+
+	ResponseType string `json:"response_type,omitempty"`
 }
 
 type MessagesResponse struct {
@@ -24,6 +18,7 @@ type Message struct {
 	Type string `json:"type"`
 	User string `json:"user"`
 	Text string `json:"text"`
+
 	// https://api.slack.com/messaging/retrieving#finding_threads
 	TS       string `json:"ts"`
 	ThreadTS string `json:"thread_ts"`
@@ -47,9 +42,7 @@ type Profile struct {
 }
 
 type CommandPayload struct {
-	Command     string `form:"command"`
 	Text        string `form:"text"`
 	ResponseURL string `form:"response_url"`
-	UserID      string `form:"user_id"`
 	ChannelID   string `form:"channel_id"`
 }

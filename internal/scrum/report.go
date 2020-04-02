@@ -1,4 +1,4 @@
-package report
+package scrum
 
 import (
 	"collector/pkg/slack"
