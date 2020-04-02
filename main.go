@@ -30,7 +30,7 @@ func main() {
 		if err := ctx.Bind(&commandPayload); err != nil {
 			log.Fatal(err)
 		}
-		log.Println(commandPayload)
+		log.Printf("CommandPayload: %+v\n", commandPayload)
 
 		switch commandPayload.Command {
 		case "collect":
