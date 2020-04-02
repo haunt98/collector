@@ -40,5 +40,6 @@ type CommandPayload struct {
 	Command     string `form:"command"`
 	Text        string `form:"text"`
 	ResponseURL string `form:"response_url"`
+	UserID      string `form:"user_id"`
 	ChannelID   string `form:"channel_id"`
 }
