@@ -1,3 +1,3 @@
 git add -A
-git commit -m "$DATE-$RANDOM"
+git commit -m "$(date)-$(random)"
 git push
