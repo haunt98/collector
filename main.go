@@ -14,12 +14,15 @@ func main() {
 	// PORT
 	port := os.Getenv("PORT")
 	if port == "" {
-		log.Println("PORT is empty")
-		return
+		log.Fatal("PORT is empty")
 	}
 	log.Printf("PORT is %s\n", port)
 
-	s := slack.NewSlack("")
+	token := os.Getenv("TOKEN")
+	if token == "" {
+		log.Fatal("TOKEN is empty")
+	}
+	s := slack.NewSlack(token)
 
 	r := gin.Default()
 	r.GET("/ping", func(ctx *gin.Context) {
@@ -39,6 +42,7 @@ func main() {
 			}
 		case "summary":
 			ctx.String(http.StatusOK, "got it wait it")
+
 		default:
 			ctx.String(http.StatusOK, "wrong hole")
 		}
