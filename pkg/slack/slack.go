@@ -22,6 +22,7 @@ const (
 	chatPostMessageURL      = "chat.postMessage"      // https://api.slack.com/methods/chat.postMessage
 	conversationsRepliesURL = "conversations.replies" // https://api.slack.com/methods/conversations.replies
 	usersListURL            = "users.list"            // https://api.slack.com/methods/users.list
+	conversationsHistory    = "conversations.history"
 )
 
 func NewSlack(token string) *Slack {
@@ -169,5 +170,31 @@ func (c *Slack) postMessageByWebhook(webhookURL string, msgReq MessageRequest) (
 	}
 
 	log.Println(string(body))
+	return
+}
+
+func (c *Slack) GetChannelHistory(channel string) (result MessagesResponse, err error) {
+	url := fmt.Sprintf("%s%s?token=%s&channel=%s",
+		baseURL, conversationsHistory, c.token, channel)
+
+	var req *http.Request
+	req, err = http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return
+	}
+
+	var rsp *http.Response
+	rsp, err = c.client.Do(req)
+	if err != nil {
+		return
+	}
+
+	var body []byte
+	body, err = ioutil.ReadAll(rsp.Body)
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(body, &result)
 	return
 }

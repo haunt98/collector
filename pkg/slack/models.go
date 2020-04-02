@@ -27,6 +27,8 @@ type Message struct {
 	// https://api.slack.com/messaging/retrieving#finding_threads
 	TS       string `json:"ts"`
 	ThreadTS string `json:"thread_ts"`
+
+	BotID string `json:"bot_id"`
 }
 
 type UsersResponse struct {
