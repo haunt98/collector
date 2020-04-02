@@ -119,13 +119,42 @@ func readReportFromMessage(text string) (ok bool, yesterday, today, problem, sol
 }
 
 func betterReportFromMessage(text string) (ok bool, yesterday, today, problem, solution string) {
-	consume2 := regexp.MustCompile(`(?is)(?:hom\s+qua|hom\s+kia|hom\s+bua|hom\s+truoc|tuan\s+qua|tuan\s+truoc|tuan\s+kia)(.+?)(?:hom\s+nay)(.+)`)
-	if !consume2.MatchString(text) {
+	ok, yesterday, today, problem, solution = consume3(text)
+	if ok {
+		return
+	}
+
+	ok, yesterday, today, problem, solution = consume2(text)
+	if ok {
+		return
+	}
+
+	ok = false
+	return
+}
+
+func consume3(text string) (ok bool, yesterday, today, problem, solution string) {
+	regex := regexp.MustCompile(`(?is)(?:hom\s+qua|hom\s+kia|hom\s+bua|hom\s+truoc|tuan\s+qua|tuan\s+truoc|tuan\s+kia)(.+?)(?:hom\s+nay)(.+?)(?:kho\s+khan|van\s+de)(.+)`)
+	if !regex.MatchString(text) {
 		ok = false
 		return
 	}
 
-	subs := consume2.FindStringSubmatch(text)
+	subs := regex.FindStringSubmatch(text)
+	yesterday = subs[1]
+	today = subs[2]
+	ok = true
+	return
+}
+
+func consume2(text string) (ok bool, yesterday, today, problem, solution string) {
+	regex := regexp.MustCompile(`(?is)(?:hom\s+qua|hom\s+kia|hom\s+bua|hom\s+truoc|tuan\s+qua|tuan\s+truoc|tuan\s+kia)(.+?)(?:hom\s+nay)(.+)`)
+	if !regex.MatchString(text) {
+		ok = false
+		return
+	}
+
+	subs := regex.FindStringSubmatch(text)
 	yesterday = subs[1]
 	today = subs[2]
 	ok = true
