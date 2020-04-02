@@ -19,6 +19,8 @@ func main() {
 	}
 	log.Printf("PORT is %s\n", port)
 
+	s := slack.NewSlack("")
+
 	r := gin.Default()
 	r.GET("/ping", func(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "ping")
@@ -30,11 +32,13 @@ func main() {
 		}
 		log.Println(commandPayload)
 
-		// ctx.String(http.StatusOK, "<3")
-
-		s := slack.NewSlack("")
-		if err := s.PostThreadMessageByWebhook(commandPayload.ResponseURL, "another <3", "in_channel"); err != nil {
-			log.Fatal(err)
+		switch commandPayload.Command {
+		case "collect":
+			if err := s.PostThreadMessageByWebhook(commandPayload.ResponseURL, "update please", "in_channel"); err != nil {
+				log.Fatal(err)
+			}
+		case "summary":
+			ctx.String(http.StatusOK, "got it wait it")
 		}
 	})
 
