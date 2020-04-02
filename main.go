@@ -1,6 +1,7 @@
 package main
 
 import (
+	"collector/pkg/slack"
 	"fmt"
 	"log"
 	"net/http"
@@ -30,11 +31,11 @@ func main() {
 		log.Println(commandPayload)
 
 		ctx.String(http.StatusOK, "<3")
-		//
-		//s := slack.NewSlack("")
-		//if err := s.PostThreadMessageByWebhook(commandPayload.ResponseURL, "another <3", "in_channel"); err != nil {
-		//	log.Fatal(err)
-		//}
+
+		s := slack.NewSlack("")
+		if err := s.PostThreadMessageByWebhook(commandPayload.ResponseURL, "another <3", "in_channel"); err != nil {
+			log.Fatal(err)
+		}
 	})
 
 	if err := r.Run(fmt.Sprintf(":%s", port)); err != nil {

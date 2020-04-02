@@ -168,6 +168,6 @@ func (c *Slack) postMessageByWebhook(webhookURL string, msgReq MessageRequest) (
 		return
 	}
 
-	log.Fatal(string(body))
+	log.Println(string(body))
 	return
 }
