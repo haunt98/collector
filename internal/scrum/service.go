@@ -25,7 +25,7 @@ func NewService(slackService *slack.Service, token, botID string) *Service {
 const (
 	collectCommand = "collect"
 	summaryCommand = "summary"
-	wrongCommand   = "sai rồi anh ơi"
+	wrongCommand   = "sai câu lệnh rồi anh ơi"
 
 	message        = "message"
 	collectMessage = "Update công việc tại đây nha mấy anh ơi :licklick:"
@@ -39,7 +39,6 @@ func (s *Service) Handle(ctx *gin.Context) {
 	if err := ctx.Bind(&payload); err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("CommandPayload: %+v\n", payload)
 
 	switch payload.Text {
 	case collectCommand:
@@ -85,7 +84,7 @@ func (s *Service) summary(ctx *gin.Context, payload slack.CommandPayload) {
 		log.Fatal(err)
 	}
 
-	reportMsg := makeMessage(conversationReplies.Messages, usersList.Users)
+	reportMsg := makeSummary(conversationReplies.Messages, usersList.Users)
 	if err := s.slackService.PostThreadMessageByWebhook(payload.ResponseURL, summaryMessage+reportMsg, responseInChannel); err != nil {
 		log.Fatal(err)
 	}
