@@ -28,8 +28,8 @@ const (
 	wrongCommand   = "Sai câu lệnh rồi anh ơi"
 
 	message        = "message"
-	collectMessage = "Update công việc tại đây nha mấy anh ơi :licklick:"
-	summaryMessage = "Em xin tổng hợp nhẹ :licklick:, copy rồi quăng qua wiki confluence nha mấy anh :licklick:\n"
+	collectMessage = "Update công việc tại đây nha mấy anh ơi :licklick: <@channel>"
+	summaryMessage = "Em xin tổng hợp nhẹ :licklick:, copy rồi quăng qua wiki confluence nha mấy anh :licklick: <@channel>\n"
 
 	responseInChannel = "in_channel"
 
