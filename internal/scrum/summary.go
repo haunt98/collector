@@ -24,7 +24,8 @@ func makeSummary(messages []slack.Message, users []slack.User) string {
 	result += fmt.Sprintf("|| %s || %s || %s || %s || %s ||\n", domainTitle, beforeTitle, nowTitle, problemTitle, solutionTitle)
 	reports := makeReports(cleanedMessages, cleanedUsers)
 	for _, s := range reports {
-		result += "| " + s.name + " | " + s.before + " | " + s.now + " | " + s.problem + " | " + s.solution + " |\n"
+		result += fmt.Sprintf("| *%s* | %s | %s | %s | %s |\n",
+			s.name, s.before, s.now, s.problem, s.solution)
 	}
 	result += "```"
 	return result
