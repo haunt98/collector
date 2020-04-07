@@ -56,17 +56,8 @@ func (s *Service) HandlerGet(ctx *gin.Context) {
 	channel := ctx.Query("channel")
 	ts := ctx.Query("ts")
 
-	conversationReplies, err := s.slackService.GetConversationReplies(s.token, channel, ts)
-	if err != nil {
-		log.Fatal(err)
-	}
+	reportMsg := s.makeSummary(channel, ts)
 
-	usersList, err := s.slackService.GetUsersList(s.token)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	reportMsg := makeSummary(conversationReplies.Messages, usersList.Users)
 	ctx.String(http.StatusOK, reportMsg)
 }
 
@@ -82,8 +73,15 @@ func (s *Service) summary(ctx *gin.Context, payload slack.CommandPayload) {
 	ctx.String(http.StatusOK, "")
 
 	botMsg := s.loopGetHistoryUntil(payload, maxLoop)
+	reportMsg := s.makeSummary(payload.ChannelID, botMsg.TS)
 
-	conversationReplies, err := s.slackService.GetConversationReplies(s.token, payload.ChannelID, botMsg.TS)
+	if err := s.slackService.PostThreadMessageByWebhook(payload.ResponseURL, summaryMessage+reportMsg, responseInChannel); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (s *Service) makeSummary(channel, thread string) string {
+	conversationReplies, err := s.slackService.GetConversationReplies(s.token, channel, thread)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -93,10 +91,7 @@ func (s *Service) summary(ctx *gin.Context, payload slack.CommandPayload) {
 		log.Fatal(err)
 	}
 
-	reportMsg := makeSummary(conversationReplies.Messages, usersList.Users)
-	if err := s.slackService.PostThreadMessageByWebhook(payload.ResponseURL, summaryMessage+reportMsg, responseInChannel); err != nil {
-		log.Fatal(err)
-	}
+	return makeSummary(conversationReplies.Messages, usersList.Users)
 }
 
 func (s *Service) loopGetHistoryUntil(payload slack.CommandPayload, max int) (result slack.Message) {
