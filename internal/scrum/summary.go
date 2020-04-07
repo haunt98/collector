@@ -62,7 +62,7 @@ func makeReports(cleanedMessages []slack.Message, cleanedUsers map[string]string
 	for _, msg := range cleanedMessages {
 		var r report
 		var ok bool
-		ok, r = makeReport(msg.Text)
+		ok, r = makeReport(msg.Text, cleanedUsers)
 		if !ok {
 			continue
 		}
@@ -72,15 +72,17 @@ func makeReports(cleanedMessages []slack.Message, cleanedUsers map[string]string
 	return reports
 }
 
-func makeReport(text string) (ok bool, r report) {
+func makeReport(text string, cleanedUsers map[string]string) (ok bool, r report) {
 	defer func() {
-		r.before = beautifyText(r.before)
-		r.now = beautifyText(r.now)
-		r.problem = beautifyText(r.problem)
-		r.solution = beautifyText(r.solution)
+		r.before = trimSpace(r.before)
+		r.now = trimSpace(r.now)
+		r.problem = trimSpace(r.problem)
+		r.solution = trimSpace(r.solution)
 	}()
 
-	text = simplyfyText(text)
+	text = removeStar(text)
+	text = convertSlack2ConfluenceLinks(text)
+	text = convertSlackUsers(text, cleanedUsers)
 
 	ok, r = consume4(text)
 	if ok {
@@ -140,11 +142,12 @@ func consume2(text string) (ok bool, r report) {
 	return
 }
 
-func simplyfyText(text string) string {
-	// remove *
-	text = strings.ReplaceAll(text, "*", "")
+// remove *
+func removeStar(text string) string {
+	return strings.ReplaceAll(text, "*", "")
+}
 
-	// convert links to confluence
+func convertSlack2ConfluenceLinks(text string) string {
 	regex := regexp.MustCompile(`\(.*<(http.+)\|.*>.*\)`)
 	if !regex.MatchString(text) {
 		return text
@@ -164,7 +167,14 @@ func simplyfyText(text string) string {
 	return text
 }
 
-func beautifyText(text string) string {
+func convertSlackUsers(text string, cleanedUsers map[string]string) string {
+	for id, name := range cleanedUsers {
+		text = strings.ReplaceAll(text, fmt.Sprintf("<@%s>", id), fmt.Sprintf("@%s", name))
+	}
+	return text
+}
+
+func trimSpace(text string) string {
 	if len(text) == 0 {
 		return ""
 	}
