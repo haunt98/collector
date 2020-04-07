@@ -3,6 +3,7 @@ package scrum
 import (
 	"collector/pkg/slack"
 	"fmt"
+	"log"
 	"regexp"
 	"strings"
 )
@@ -142,6 +143,19 @@ func consume2(text string) (ok bool, r report) {
 func simplyfyText(text string) string {
 	// remove *
 	text = strings.ReplaceAll(text, "*", "")
+
+	// convert links to confluence
+	regex := regexp.MustCompile(`\(<(http.+)\|.*>\)`)
+	if !regex.MatchString(text) {
+		return text
+	}
+
+	subs := regex.FindAllStringSubmatch(text, -1)
+	for _, sub := range subs {
+		for i := range sub {
+			log.Println(i, sub[i])
+		}
+	}
 
 	return text
 }
