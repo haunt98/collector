@@ -145,7 +145,7 @@ func simplyfyText(text string) string {
 	text = strings.ReplaceAll(text, "*", "")
 
 	// convert links to confluence
-	regex := regexp.MustCompile(`\(<(http.+)\|.*>\)`)
+	regex := regexp.MustCompile(`\(.*<(http.+)\|.*>.*\)`)
 	if !regex.MatchString(text) {
 		return text
 	}
