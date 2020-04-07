@@ -79,6 +79,8 @@ func makeReport(text string) (ok bool, r report) {
 		r.solution = beautifyText(r.solution)
 	}()
 
+	text = simplyfyText(text)
+
 	ok, r = consume4(text)
 	if ok {
 		return
@@ -135,6 +137,13 @@ func consume2(text string) (ok bool, r report) {
 	r.before, r.now = subs[1], subs[2]
 	ok = true
 	return
+}
+
+func simplyfyText(text string) string {
+	// remove *
+	text = strings.ReplaceAll(text, "*", "")
+
+	return text
 }
 
 func beautifyText(text string) string {
