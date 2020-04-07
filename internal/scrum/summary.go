@@ -3,6 +3,7 @@ package scrum
 import (
 	"collector/pkg/slack"
 	"fmt"
+	"log"
 	"regexp"
 	"strings"
 )
@@ -153,6 +154,9 @@ func simplyfyText(text string) string {
 	for _, sub := range subs {
 		original := sub[0]
 		confluenceLink := "[" + sub[1] + "]"
+
+		log.Println("original", original)
+		log.Println("confluenceLink", confluenceLink)
 
 		text = strings.ReplaceAll(text, original, confluenceLink)
 	}
