@@ -36,7 +36,7 @@ const (
 	maxLoop = 2
 )
 
-func (s *Service) Handle(ctx *gin.Context) {
+func (s *Service) HandlerPost(ctx *gin.Context) {
 	var payload slack.CommandPayload
 	if err := ctx.Bind(&payload); err != nil {
 		log.Fatal(err)
@@ -50,6 +50,24 @@ func (s *Service) Handle(ctx *gin.Context) {
 	default:
 		ctx.String(http.StatusOK, wrongCommand)
 	}
+}
+
+func (s *Service) HandlerGet(ctx *gin.Context) {
+	channel := ctx.Query("channel")
+	ts := ctx.Query("ts")
+
+	conversationReplies, err := s.slackService.GetConversationReplies(s.token, channel, ts)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	usersList, err := s.slackService.GetUsersList(s.token)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	reportMsg := makeSummary(conversationReplies.Messages, usersList.Users)
+	ctx.String(http.StatusOK, reportMsg)
 }
 
 func (s *Service) collect(ctx *gin.Context, payload slack.CommandPayload) {
@@ -82,7 +100,7 @@ func (s *Service) summary(ctx *gin.Context, payload slack.CommandPayload) {
 }
 
 func (s *Service) loopGetHistoryUntil(payload slack.CommandPayload, max int) (result slack.Message) {
-	cursor := ""
+	var cursor string
 	for i := 0; i < max; i += 1 {
 		conversationHistory, err := s.slackService.GetConversationHistory(s.token, payload.ChannelID, cursor)
 		if err != nil {

@@ -32,7 +32,9 @@ func main() {
 	scrumService := scrum.NewService(slackService, token, botID)
 	r := gin.Default()
 
-	r.POST("/scrum", scrumService.Handle)
+	r.POST("/scrum", scrumService.HandlerPost)
+	r.GET("/scrum", scrumService.HandlerGet)
+
 	r.GET("/ping", func(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "pong")
 	})
