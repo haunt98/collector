@@ -15,18 +15,16 @@ const (
 	solutionTitle = "Giải pháp"
 )
 
-func makeSummary(messages []slack.Message, users []slack.User) string {
+func makeConfluenceSummary(messages []slack.Message, users []slack.User) string {
 	cleanedUsers := cleanUsers(users)
 	cleanedMessages := cleanMessages(messages, cleanedUsers)
 
-	result := "```\n"
-	result += fmt.Sprintf("|| %s || %s || %s || %s || %s ||\n", domainTitle, beforeTitle, nowTitle, problemTitle, solutionTitle)
+	result := fmt.Sprintf("|| %s || %s || %s || %s || %s ||\n", domainTitle, beforeTitle, nowTitle, problemTitle, solutionTitle)
 	reports := makeReports(cleanedMessages, cleanedUsers)
 	for _, s := range reports {
 		result += fmt.Sprintf("| *%s* | %s | %s | %s | %s |\n",
 			s.name, s.before, s.now, s.problem, s.solution)
 	}
-	result += "```"
 	return result
 }
 
@@ -147,6 +145,7 @@ func consume2(text string) (ok bool, r report) {
 func removeStar(text string) string {
 	text = strings.ReplaceAll(text, " *", " ")
 	text = strings.ReplaceAll(text, "* ", " ")
+	text = strings.ReplaceAll(text, "*:", " ")
 	return text
 }
 

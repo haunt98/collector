@@ -56,9 +56,9 @@ func (s *Service) HandlerGet(ctx *gin.Context) {
 	channel := ctx.Query("channel")
 	ts := ctx.Query("ts")
 
-	reportMsg := s.makeSummary(channel, ts)
+	summary := s.makeSummary(channel, ts)
 
-	ctx.String(http.StatusOK, reportMsg)
+	ctx.String(http.StatusOK, summary)
 }
 
 func (s *Service) collect(ctx *gin.Context, payload slack.CommandPayload) {
@@ -73,9 +73,10 @@ func (s *Service) summary(ctx *gin.Context, payload slack.CommandPayload) {
 	ctx.String(http.StatusOK, "")
 
 	botMsg := s.loopGetHistoryUntil(payload, maxLoop)
-	reportMsg := s.makeSummary(payload.ChannelID, botMsg.TS)
+	summary := s.makeSummary(payload.ChannelID, botMsg.TS)
+	summaryExtra := summaryMessage + "```\n" + summary + "```"
 
-	if err := s.slackService.PostThreadMessageByWebhook(payload.ResponseURL, summaryMessage+reportMsg, responseInChannel); err != nil {
+	if err := s.slackService.PostThreadMessageByWebhook(payload.ResponseURL, summaryExtra, responseInChannel); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -91,7 +92,7 @@ func (s *Service) makeSummary(channel, thread string) string {
 		log.Fatal(err)
 	}
 
-	return makeSummary(conversationReplies.Messages, usersList.Users)
+	return makeConfluenceSummary(conversationReplies.Messages, usersList.Users)
 }
 
 func (s *Service) loopGetHistoryUntil(payload slack.CommandPayload, max int) (result slack.Message) {
