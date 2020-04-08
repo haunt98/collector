@@ -3,7 +3,6 @@ package scrum
 import (
 	"collector/pkg/slack"
 	"fmt"
-	"log"
 	"regexp"
 	"strings"
 )
@@ -83,6 +82,7 @@ func makeReport(text string, cleanedUsers map[string]string) (ok bool, r report)
 
 	text = removeStar(text)
 	text = convertSlack2ConfluenceLinks(text)
+	text = convertSlack2ConfluenceLists(text)
 	text = convertSlackUsers(text, cleanedUsers)
 
 	ok, r = consume4(text)
@@ -158,9 +158,6 @@ func convertSlack2ConfluenceLinks(text string) string {
 	for _, sub := range subs {
 		original := sub[0]
 		confluenceLink := "[" + sub[1] + "]"
-
-		log.Println("original", original)
-		log.Println("confluenceLink", confluenceLink)
 
 		text = strings.ReplaceAll(text, original, confluenceLink)
 	}
