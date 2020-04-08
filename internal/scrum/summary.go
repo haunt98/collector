@@ -168,6 +168,13 @@ func convertSlack2ConfluenceLinks(text string) string {
 	return text
 }
 
+func convertSlack2ConfluenceLists(text string) string {
+	text = strings.ReplaceAll(text, "•", "*")
+	text = strings.ReplaceAll(text, "-", "*")
+	text = strings.ReplaceAll(text, "* *", "**")
+	return text
+}
+
 func convertSlackUsers(text string, cleanedUsers map[string]string) string {
 	for id, name := range cleanedUsers {
 		text = strings.ReplaceAll(text, fmt.Sprintf("<@%s>", id), fmt.Sprintf("@%s", name))
