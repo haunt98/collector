@@ -28,8 +28,8 @@ const (
 	wrongCommand   = "Sai câu lệnh rồi anh ơi"
 
 	message        = "message"
-	collectMessage = "Update công việc tại đây nha mấy anh ơi :licklick: <!channel>"
-	summaryMessage = "Em xin tổng hợp nhẹ :licklick:, copy rồi quăng qua wiki confluence nha mấy anh :licklick: <!channel>\n"
+	collectMessage = "Update công việc mấy anh ơi :licklick: <!channel>"
+	summaryMessage = "Em xin tổng hợp công việc :licklick: <!channel>"
 
 	responseInChannel = "in_channel"
 
@@ -79,7 +79,7 @@ func (s *Service) summary(ctx *gin.Context, payload slack.CommandPayload) {
 
 	botMsg := s.loopGetHistoryUntil(payload.ChannelID, maxLoop)
 	summary := s.makeSummary(payload.ChannelID, botMsg.TS)
-	summaryExtra := summaryMessage + "```\n" + summary + "```"
+	summaryExtra := summaryMessage + "\n```\n" + summary + "```"
 
 	if err := s.slackService.PostThreadMessageByWebhook(payload.ResponseURL, summaryExtra, responseInChannel); err != nil {
 		log.Fatal(err)
