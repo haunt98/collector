@@ -103,7 +103,7 @@ func makeReport(text string, cleanedUsers map[string]string) (ok bool, r report)
 }
 
 func consume4(text string) (ok bool, r report) {
-	regex := regexp.MustCompile(`(?is)(?:hôm\s+qua|hôm\s+kia|hôm\s+bữa|hôm\s+trước|tuần\s+qua|tuần\s+trước|tuần\s+kia)(.+?)(?:hôm\s+nay|tuần\snày)(.+?)(?:khó\s+khăn|vấn\s+đề)(.+?)(?:giải\s+pháp|giải\s+quyết)(.+)`)
+	regex := regexp.MustCompile(`(?is)(?:h[oô]m\s+qua|h[oô]m\s+kia|h[oô]m\s+b[uưữ]a|h[oô]m\s+tr[uư][oơớ]c|tu[aâầ]n\s+qua|tu[aâầ]n\s+tr[uư][ơớ]c|tu[aâầ]n\s+kia)(.+?)(?:h[oô]m\s+nay|tu[aâầ]n\sn[aà]y)(.+?)(?:kh[oó]\s+kh[aă]n|v[aâấ]n\s+[dđ][eêề])(.+?)(?:gi[aả]i\s+ph[aá]p|gi[aả]i\s+quy[eêế]t)(.+)`)
 	if !regex.MatchString(text) {
 		ok = false
 		return
@@ -116,7 +116,7 @@ func consume4(text string) (ok bool, r report) {
 }
 
 func consume3(text string) (ok bool, r report) {
-	regex := regexp.MustCompile(`(?is)(?:hôm\s+qua|hôm\s+kia|hôm\s+bữa|hôm\s+trước|tuần\s+qua|tuần\s+trước|tuần\s+kia)(.+?)(?:hôm\s+nay|tuần\snày)(.+?)(?:khó\s+khăn|vấn\s+đề)(.+)`)
+	regex := regexp.MustCompile(`(?is)(?:h[oô]m\s+qua|h[oô]m\s+kia|h[oô]m\s+b[uưữ]a|h[oô]m\s+tr[uư][oơớ]c|tu[aâầ]n\s+qua|tu[aâầ]n\s+tr[uư][ơớ]c|tu[aâầ]n\s+kia)(.+?)(?:h[oô]m\s+nay|tu[aâầ]n\sn[aà]y)(.+?)(?:kh[oó]\s+kh[aă]n|v[aâấ]n\s+[dđ][eêề])(.+)`)
 	if !regex.MatchString(text) {
 		ok = false
 		return
@@ -129,7 +129,7 @@ func consume3(text string) (ok bool, r report) {
 }
 
 func consume2(text string) (ok bool, r report) {
-	regex := regexp.MustCompile(`(?is)(?:hôm\s+qua|hôm\s+kia|hôm\s+bữa|hôm\s+trước|tuần\s+qua|tuần\s+trước|tuần\s+kia)(.+?)(?:hôm\s+nay|tuần\snày)(.+)`)
+	regex := regexp.MustCompile(`(?is)(?:h[oô]m\s+qua|h[oô]m\s+kia|h[oô]m\s+b[uưữ]a|h[oô]m\s+tr[uư][oơớ]c|tu[aâầ]n\s+qua|tu[aâầ]n\s+tr[uư][ơớ]c|tu[aâầ]n\s+kia)(.+?)(?:h[oô]m\s+nay|tu[aâầ]n\sn[aà]y)(.+)`)
 	if !regex.MatchString(text) {
 		ok = false
 		return
