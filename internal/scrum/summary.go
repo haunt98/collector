@@ -3,6 +3,7 @@ package scrum
 import (
 	"collector/pkg/slack"
 	"fmt"
+	"log"
 	"regexp"
 	"strings"
 )
@@ -21,9 +22,10 @@ func makeConfluenceSummary(messages []slack.Message, users []slack.User) string 
 
 	result := fmt.Sprintf("|| %s || %s || %s || %s || %s ||\n", domainTitle, beforeTitle, nowTitle, problemTitle, solutionTitle)
 	reports := makeReports(cleanedMessages, cleanedUsers)
-	for _, s := range reports {
+	for _, report := range reports {
+		log.Println(report)
 		result += fmt.Sprintf("| *%s* | %s | %s | %s | %s |\n",
-			s.name, s.before, s.now, s.problem, s.solution)
+			report.name, report.before, report.now, report.problem, report.solution)
 	}
 	return result
 }
