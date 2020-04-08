@@ -149,7 +149,7 @@ func removeStar(text string) string {
 }
 
 func convertSlack2ConfluenceLinks(text string) string {
-	regex := regexp.MustCompile(`\(.*<(http.+)\|.*>.*\)`)
+	regex := regexp.MustCompile(`\(\s*<(http.+)\|.*>\s*\)`)
 	subs := regex.FindAllStringSubmatch(text, -1)
 	for _, sub := range subs {
 		original := sub[0]
