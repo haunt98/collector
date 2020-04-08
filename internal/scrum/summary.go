@@ -145,8 +145,8 @@ func consume2(text string) (ok bool, r report) {
 
 // remove *
 func removeStar(text string) string {
-	text = strings.ReplaceAll(text, " *", "")
-	text = strings.ReplaceAll(text, "* ", "")
+	text = strings.ReplaceAll(text, " *", " ")
+	text = strings.ReplaceAll(text, "* ", " ")
 	return text
 }
 
@@ -173,9 +173,9 @@ func convertSlack2ConfluenceLinks(text string) string {
 }
 
 func convertSlack2ConfluenceLists(text string) string {
-	text = strings.ReplaceAll(text, "•", "*")
-	text = strings.ReplaceAll(text, "-", "*")
-	text = strings.ReplaceAll(text, "* *", "**")
+	text = strings.ReplaceAll(text, "• ", "* ")
+	text = strings.ReplaceAll(text, "- ", "* ")
+	text = strings.ReplaceAll(text, "* * ", "** ")
 	return text
 }
 
