@@ -82,6 +82,7 @@ func makeReport(text string, cleanedUsers map[string]string) (ok bool, r report)
 	text = convertSlack2ConfluenceLinks(text)
 	text = convertSlack2ConfluenceLists(text)
 	text = convertSlackUsers(text, cleanedUsers)
+	text = removeVertical(text)
 
 	ok, r = consume4(text)
 	if ok {
@@ -144,6 +145,12 @@ func consume2(text string) (ok bool, r report) {
 // remove *
 func removeStar(text string) string {
 	text = strings.ReplaceAll(text, "*", "")
+	return text
+}
+
+// remove | for not messing with confluence links
+func removeVertical(text string) string {
+	text = strings.ReplaceAll(text, "|", `\|`)
 	return text
 }
 
