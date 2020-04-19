@@ -5,7 +5,6 @@ import (
 	"collector/pkg/slack"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -34,10 +33,6 @@ func main() {
 
 	r.POST("/scrum", scrumService.HandlerPost)
 	r.GET("/scrum", scrumService.HandlerGet)
-
-	r.GET("/ping", func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "pong")
-	})
 
 	if err := r.Run(fmt.Sprintf(":%s", port)); err != nil {
 		log.Fatal(err)
