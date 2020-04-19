@@ -51,7 +51,7 @@ func ExtractLinks(input string) ([]Link, bool) {
 	}
 
 	// url
-	regex = regexp.MustCompile(`((?:http|www\.)[^\s\|]+?)(?:\s|$)`)
+	regex = regexp.MustCompile(`((?:http|www\.)[^\s|]+?)(?:\s|$)`)
 	if regex.MatchString(input) {
 		submatches := regex.FindAllStringSubmatch(input, -1)
 

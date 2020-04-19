@@ -79,12 +79,14 @@ func makeReport(text string, cleanedUsers map[string]string) (ok bool, r report)
 		r.solution = trimSpace(r.solution)
 	}()
 
-	text = removeStar(text)
+	text = slack.RemoveBold(text)
 	text = convertSlack2ConfluenceLinks(text)
-	text = convertSlack2ConfluenceLists(text)
 	text = convertSlackUsers(text, cleanedUsers)
-	text = removeVertical(text)
-	text = uppercaseFirst(text)
+	text = confluence.NormalizeVerticalCharacter(text)
+	text = confluence.NormalizeList(text)
+	text = confluence.TitleList(text)
+
+	text = TitleSentence(text)
 
 	ok, r = consume4(text)
 	if ok {
@@ -106,7 +108,7 @@ func makeReport(text string, cleanedUsers map[string]string) (ok bool, r report)
 }
 
 func consume4(text string) (ok bool, r report) {
-	regex := regexp.MustCompile(`(?is)(?:h[oô]m\s+qua|h[oô]m\s+kia|h[oô]m\s+b[uưữ]a|h[oô]m\s+tr[uư][oơớ]c|tu[aâầ]n\s+qua|tu[aâầ]n\s+tr[uư][ơớ]c|tu[aâầ]n\s+kia)(.+?)(?:h[oô]m\s+nay|tu[aâầ]n\sn[aà]y)(.+?)(?:kh[oó]\s+kh[aă]n|v[aâấ]n\s+[dđ][eêề])(.+?)(?:gi[aả]i\s+ph[aá]p|gi[aả]i\s+quy[eêế]t)(.+)`)
+	regex := regexp.MustCompile(`(?is)(?:yesterday|h[oô]m\s+qua|h[oô]m\s+kia|h[oô]m\s+b[uưữ]a|h[oô]m\s+tr[uư][oơớ]c|tu[aâầ]n\s+qua|tu[aâầ]n\s+tr[uư][ơớ]c|tu[aâầ]n\s+kia)(.+?)(?:today|h[oô]m\s+nay|tu[aâầ]n\sn[aà]y)(.+?)(?:problem|kh[oó]\s+kh[aă]n|v[aâấ]n\s+[dđ][eêề])(.+?)(?:solution|gi[aả]i\s+ph[aá]p|gi[aả]i\s+quy[eêế]t)(.+)`)
 	if !regex.MatchString(text) {
 		ok = false
 		return
@@ -119,7 +121,7 @@ func consume4(text string) (ok bool, r report) {
 }
 
 func consume3(text string) (ok bool, r report) {
-	regex := regexp.MustCompile(`(?is)(?:h[oô]m\s+qua|h[oô]m\s+kia|h[oô]m\s+b[uưữ]a|h[oô]m\s+tr[uư][oơớ]c|tu[aâầ]n\s+qua|tu[aâầ]n\s+tr[uư][ơớ]c|tu[aâầ]n\s+kia)(.+?)(?:h[oô]m\s+nay|tu[aâầ]n\sn[aà]y)(.+?)(?:kh[oó]\s+kh[aă]n|v[aâấ]n\s+[dđ][eêề])(.+)`)
+	regex := regexp.MustCompile(`(?is)(?:yesterday|h[oô]m\s+qua|h[oô]m\s+kia|h[oô]m\s+b[uưữ]a|h[oô]m\s+tr[uư][oơớ]c|tu[aâầ]n\s+qua|tu[aâầ]n\s+tr[uư][ơớ]c|tu[aâầ]n\s+kia)(.+?)(?:today|h[oô]m\s+nay|tu[aâầ]n\sn[aà]y)(.+?)(?:problem|kh[oó]\s+kh[aă]n|v[aâấ]n\s+[dđ][eêề])(.+)`)
 	if !regex.MatchString(text) {
 		ok = false
 		return
@@ -132,7 +134,7 @@ func consume3(text string) (ok bool, r report) {
 }
 
 func consume2(text string) (ok bool, r report) {
-	regex := regexp.MustCompile(`(?is)(?:h[oô]m\s+qua|h[oô]m\s+kia|h[oô]m\s+b[uưữ]a|h[oô]m\s+tr[uư][oơớ]c|tu[aâầ]n\s+qua|tu[aâầ]n\s+tr[uư][ơớ]c|tu[aâầ]n\s+kia)(.+?)(?:h[oô]m\s+nay|tu[aâầ]n\sn[aà]y)(.+)`)
+	regex := regexp.MustCompile(`(?is)(?:yesterday|h[oô]m\s+qua|h[oô]m\s+kia|h[oô]m\s+b[uưữ]a|h[oô]m\s+tr[uư][oơớ]c|tu[aâầ]n\s+qua|tu[aâầ]n\s+tr[uư][ơớ]c|tu[aâầ]n\s+kia)(.+?)(?:today|h[oô]m\s+nay|tu[aâầ]n\sn[aà]y)(.+)`)
 	if !regex.MatchString(text) {
 		ok = false
 		return
@@ -144,34 +146,21 @@ func consume2(text string) (ok bool, r report) {
 	return
 }
 
-// remove *
-func removeStar(text string) string {
-	text = strings.ReplaceAll(text, "*", "")
-	return text
-}
-
-// remove | for not messing with confluence links
-func removeVertical(text string) string {
-	text = strings.ReplaceAll(text, "|", `\|`)
-	return text
-}
-
-func uppercaseFirst(text string) string {
+func TitleSentence(input string) string {
 	// . a -> . A
-	// * a -> * A
 	// : a -> : A
-	regex := regexp.MustCompile(`\. .|\* .|: .`)
-	if !regex.MatchString(text) {
-		return text
+	regex := regexp.MustCompile(`\. .|: .`)
+	if !regex.MatchString(input) {
+		return input
 	}
 
-	replaceFn := func(input string) string {
-		return strings.ToUpper(input)
+	replaceFn := func(s string) string {
+		return strings.ToUpper(s)
 	}
 
-	text = regex.ReplaceAllStringFunc(text, replaceFn)
+	input = regex.ReplaceAllStringFunc(input, replaceFn)
 
-	return text
+	return input
 }
 
 func trimSpace(text string) string {
@@ -191,42 +180,15 @@ func trimSpace(text string) string {
 }
 
 func convertSlack2ConfluenceLinks(text string) string {
-	//regex := regexp.MustCompile(`<(http.+)\|.*>`)
-	//subs := regex.FindAllStringSubmatch(text, -1)
-	//for _, sub := range subs {
-	//	original := sub[0]
-	//	confluenceLink := "[" + sub[1] + "]"
-	//
-	//	text = strings.ReplaceAll(text, original, confluenceLink)
-	//}
-	//
-	//regex = regexp.MustCompile(`<(http.+)>`)
-	//subs = regex.FindAllStringSubmatch(text, -1)
-	//for _, sub := range subs {
-	//	original := sub[0]
-	//	confluenceLink := "[" + sub[1] + "]"
-	//
-	//	text = strings.ReplaceAll(text, original, confluenceLink)
-	//}
-	//
-	//return text
-
 	links, ok := slack.ExtractLinks(text)
 	if !ok {
 		return text
 	}
 
 	for _, link := range links {
-		text = strings.ReplaceAll(text, link.Original, confluence.ComposeLink(link.URL, link.Description))
+		text = strings.ReplaceAll(text, link.Original, confluence.ComposeLinkFormat(link.URL, link.Description))
 	}
 
-	return text
-}
-
-func convertSlack2ConfluenceLists(text string) string {
-	text = strings.ReplaceAll(text, "• ", "* ")
-	text = strings.ReplaceAll(text, "- ", "* ")
-	text = strings.ReplaceAll(text, "* * ", "** ")
 	return text
 }
 
