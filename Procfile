@@ -1,1 +1,1 @@
-web: ./bin/collector
+web: ./bin/collectapi
