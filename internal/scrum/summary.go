@@ -83,6 +83,7 @@ func makeReport(text string, cleanedUsers map[string]string) (ok bool, r report)
 	text = convertSlack2ConfluenceLists(text)
 	text = convertSlackUsers(text, cleanedUsers)
 	text = removeVertical(text)
+	text = uppercaseFirst(text)
 
 	ok, r = consume4(text)
 	if ok {
@@ -154,6 +155,40 @@ func removeVertical(text string) string {
 	return text
 }
 
+func uppercaseFirst(text string) string {
+	// . a -> . A
+	// - a -> - A
+	// : a -> : A
+	regex := regexp.MustCompile(`\. .|- .|: .`)
+	if !regex.MatchString(text) {
+		return text
+	}
+
+	replaceFn := func(input string) string {
+		return strings.ToUpper(input)
+	}
+
+	text = regex.ReplaceAllStringFunc(text, replaceFn)
+
+	return text
+}
+
+func trimSpace(text string) string {
+	if len(text) == 0 {
+		return ""
+	}
+
+	text = strings.TrimSpace(text)
+
+	if text[0] == ':' {
+		text = text[1:]
+	}
+
+	text = strings.TrimSpace(text)
+
+	return text
+}
+
 func convertSlack2ConfluenceLinks(text string) string {
 	regex := regexp.MustCompile(`<(http.+)\|.*>`)
 	subs := regex.FindAllStringSubmatch(text, -1)
@@ -187,21 +222,5 @@ func convertSlackUsers(text string, cleanedUsers map[string]string) string {
 	for id, name := range cleanedUsers {
 		text = strings.ReplaceAll(text, fmt.Sprintf("<@%s>", id), fmt.Sprintf("@%s", name))
 	}
-	return text
-}
-
-func trimSpace(text string) string {
-	if len(text) == 0 {
-		return ""
-	}
-
-	text = strings.TrimSpace(text)
-
-	if text[0] == ':' {
-		text = text[1:]
-	}
-
-	text = strings.TrimSpace(text)
-
 	return text
 }
