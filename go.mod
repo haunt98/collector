@@ -1,5 +1,5 @@
 // +heroku goVersion 1.14
-// +heroku install ./cmd/... ./bin
+// +heroku install ./cmd/...
 
 module collector
 
