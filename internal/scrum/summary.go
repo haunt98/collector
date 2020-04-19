@@ -1,6 +1,7 @@
 package scrum
 
 import (
+	"collector/pkg/confluence"
 	"collector/pkg/slack"
 	"fmt"
 	"regexp"
@@ -190,22 +191,33 @@ func trimSpace(text string) string {
 }
 
 func convertSlack2ConfluenceLinks(text string) string {
-	regex := regexp.MustCompile(`<(http.+)\|.*>`)
-	subs := regex.FindAllStringSubmatch(text, -1)
-	for _, sub := range subs {
-		original := sub[0]
-		confluenceLink := "[" + sub[1] + "]"
+	//regex := regexp.MustCompile(`<(http.+)\|.*>`)
+	//subs := regex.FindAllStringSubmatch(text, -1)
+	//for _, sub := range subs {
+	//	original := sub[0]
+	//	confluenceLink := "[" + sub[1] + "]"
+	//
+	//	text = strings.ReplaceAll(text, original, confluenceLink)
+	//}
+	//
+	//regex = regexp.MustCompile(`<(http.+)>`)
+	//subs = regex.FindAllStringSubmatch(text, -1)
+	//for _, sub := range subs {
+	//	original := sub[0]
+	//	confluenceLink := "[" + sub[1] + "]"
+	//
+	//	text = strings.ReplaceAll(text, original, confluenceLink)
+	//}
+	//
+	//return text
 
-		text = strings.ReplaceAll(text, original, confluenceLink)
+	links, ok := slack.ExtractLinks(text)
+	if !ok {
+		return text
 	}
 
-	regex = regexp.MustCompile(`<(http.+)>`)
-	subs = regex.FindAllStringSubmatch(text, -1)
-	for _, sub := range subs {
-		original := sub[0]
-		confluenceLink := "[" + sub[1] + "]"
-
-		text = strings.ReplaceAll(text, original, confluenceLink)
+	for _, link := range links {
+		text = strings.ReplaceAll(text, link.Original, confluence.ComposeLink(link.URL, link.Description))
 	}
 
 	return text
