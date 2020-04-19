@@ -1,3 +1,5 @@
+// +heroku goVersion 1.14
+
 module collector
 
 go 1.14
