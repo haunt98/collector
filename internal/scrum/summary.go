@@ -157,9 +157,9 @@ func removeVertical(text string) string {
 
 func uppercaseFirst(text string) string {
 	// . a -> . A
-	// - a -> - A
+	// * a -> * A
 	// : a -> : A
-	regex := regexp.MustCompile(`\. .|- .|: .`)
+	regex := regexp.MustCompile(`\. .|\* .|: .`)
 	if !regex.MatchString(text) {
 		return text
 	}
