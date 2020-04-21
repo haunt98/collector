@@ -6,38 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNormalizeVerticalCharacter(t *testing.T) {
-	tests := []struct {
-		name  string
-		input string
-		want  string
-	}{
-		{
-			name:  "without link",
-			input: "|",
-			want:  `\|`,
-		},
-		{
-			name:  "with link",
-			input: "| [|]",
-			want:  `\| [|]`,
-		},
-		{
-			name:  "with link",
-			input: "| [|] [|]",
-			want:  `\| [|] [|]`,
-		},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			got := NormalizeVerticalCharacter(tc.input)
-
-			assert.Equal(t, tc.want, got)
-		})
-	}
-}
-
 func TestNormalizeList(t *testing.T) {
 	tests := []struct {
 		name  string
@@ -53,7 +21,7 @@ func TestNormalizeList(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := NormalizeList(tc.input)
+			got := normalizeList(tc.input)
 
 			assert.Equal(t, tc.want, got)
 		})
@@ -75,7 +43,7 @@ func TestTitleList(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := TitleList(tc.input)
+			got := titleList(tc.input)
 
 			assert.Equal(t, tc.want, got)
 		})

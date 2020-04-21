@@ -31,8 +31,8 @@ func main() {
 	scrumService := scrum.NewService(slackService, token, botID)
 	r := gin.Default()
 
-	r.POST("/scrum", scrumService.HandlerPost)
-	r.GET("/scrum", scrumService.HandlerGet)
+	r.POST("/scrum", scrumService.HandlePost)
+	r.GET("/scrum", scrumService.HandleGet)
 
 	if err := r.Run(fmt.Sprintf(":%s", port)); err != nil {
 		log.Fatal(err)
