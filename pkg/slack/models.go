@@ -4,9 +4,16 @@ type MessageRequest struct {
 	Text string `json:"text,omitempty"`
 }
 
+const (
+	ResponseTypeInChannel = "in_channel"
+	ResponseTypeEphemeral = "ephemeral"
+)
+
 type WebhookMessageRequest struct {
 	MessageRequest
 
+	// https://api.slack.com/interactivity/slash-commands#responding_to_commands
+	// response visibility to slash commands
 	ResponseType string `json:"response_type,omitempty"`
 }
 

@@ -72,6 +72,7 @@ func (s *Service) handleCollect(ctx *gin.Context, payload slack.CommandPayload) 
 	if err := s.slackService.PostMessageByWebhook(
 		payload.ResponseURL,
 		collectMessage,
+		slack.ResponseTypeInChannel,
 	); err != nil {
 		log.Fatal(err)
 	}
@@ -88,6 +89,7 @@ func (s *Service) handleSummary(ctx *gin.Context, payload slack.CommandPayload) 
 	if err := s.slackService.PostMessageByWebhook(
 		payload.ResponseURL,
 		summaryExtra,
+		slack.ResponseTypeInChannel,
 	); err != nil {
 		log.Fatal(err)
 	}
