@@ -113,6 +113,7 @@ func (c *Service) PostMessageByWebhook(webhookURL, text string) (err error) {
 		MessageRequest: MessageRequest{
 			Text: text,
 		},
+		ResponseType: "in_channel",
 	}
 
 	var body []byte

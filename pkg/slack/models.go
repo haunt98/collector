@@ -6,6 +6,8 @@ type MessageRequest struct {
 
 type WebhookMessageRequest struct {
 	MessageRequest
+
+	ResponseType string `json:"response_type,omitempty"`
 }
 
 type MessagesResponse struct {
