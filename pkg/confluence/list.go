@@ -9,13 +9,13 @@ import (
 
 func normalizeList(input string) string {
 	// Bullet in start of line
-	regex := regexp.MustCompile(`^[•\-]\s`)
+	regex := regexp.MustCompile(`^[•\-]\s+`)
 	if regex.MatchString(input) {
 		input = regex.ReplaceAllString(input, "* ")
 	}
 
 	// Bullet before newline
-	regex = regexp.MustCompile(`\n[•\-]\s`)
+	regex = regexp.MustCompile(`\n\s*?[•\-]\s+`)
 	if regex.MatchString(input) {
 		input = regex.ReplaceAllString(input, "\n* ")
 	}

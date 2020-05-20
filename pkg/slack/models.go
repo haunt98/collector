@@ -6,8 +6,6 @@ type MessageRequest struct {
 
 type WebhookMessageRequest struct {
 	MessageRequest
-
-	ResponseType string `json:"response_type,omitempty"`
 }
 
 type MessagesResponse struct {
@@ -45,6 +43,7 @@ type Profile struct {
 	DisplayName string `json:"display_name"`
 }
 
+// https://api.slack.com/interactivity/slash-commands#command_payload_descriptions
 type CommandPayload struct {
 	Text        string `form:"text"`
 	ResponseURL string `form:"response_url"`

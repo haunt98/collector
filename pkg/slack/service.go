@@ -107,12 +107,12 @@ func (c *Service) GetUsersList(token string) (result UsersResponse, err error) {
 	return
 }
 
-func (c *Service) PostThreadMessageByWebhook(webhookURL, text, responseType string) (err error) {
+// https://api.slack.com/messaging/webhooks
+func (c *Service) PostMessageByWebhook(webhookURL, text string) (err error) {
 	msgReq := WebhookMessageRequest{
 		MessageRequest: MessageRequest{
 			Text: text,
 		},
-		ResponseType: responseType,
 	}
 
 	var body []byte

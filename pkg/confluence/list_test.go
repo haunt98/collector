@@ -14,8 +14,18 @@ func TestNormalizeList(t *testing.T) {
 	}{
 		{
 			name:  "list",
-			input: "- a\n - b\n",
-			want:  "* a\n * b\n",
+			input: "- a\n- b\n",
+			want:  "* a\n* b\n",
+		},
+		{
+			name:  "list",
+			input: "-  a\n - b\n",
+			want:  "* a\n* b\n",
+		},
+		{
+			name:  "list",
+			input: "-  a\n -  b\n",
+			want:  "* a\n* b\n",
 		},
 	}
 

@@ -31,8 +31,6 @@ const (
 	collectMessage = "Update công việc mấy anh ơi :licklick: <!channel>"
 	summaryMessage = "Em xin tổng hợp công việc :licklick: <!channel>"
 
-	responseInChannel = "in_channel"
-
 	maxLoop = 2
 )
 
@@ -71,8 +69,10 @@ func (s *Service) handleCollect(ctx *gin.Context, payload slack.CommandPayload) 
 	// slack need response as soon as possible
 	ctx.String(http.StatusOK, "")
 
-	if err := s.slackService.PostThreadMessageByWebhook(payload.ResponseURL,
-		collectMessage, "in_channel"); err != nil {
+	if err := s.slackService.PostMessageByWebhook(
+		payload.ResponseURL,
+		collectMessage,
+	); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -85,8 +85,10 @@ func (s *Service) handleSummary(ctx *gin.Context, payload slack.CommandPayload) 
 	summary := s.composeThreadSummary(payload.ChannelID, botMsg.TS)
 	summaryExtra := summaryMessage + "\n```\n" + summary + "```"
 
-	if err := s.slackService.PostThreadMessageByWebhook(payload.ResponseURL,
-		summaryExtra, responseInChannel); err != nil {
+	if err := s.slackService.PostMessageByWebhook(
+		payload.ResponseURL,
+		summaryExtra,
+	); err != nil {
 		log.Fatal(err)
 	}
 }
