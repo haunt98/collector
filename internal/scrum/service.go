@@ -95,8 +95,10 @@ func (s *Service) handleSummary(ctx *gin.Context, payload slack.CommandPayload) 
 			Text:   "",
 			Blocks: summaryForHuman,
 		},
-		ResponseType: "",
+		ResponseType: slack.ResponseTypeInChannel,
 	}); err != nil {
+		log.Print("This is bad")
+		log.Printf("%+v\n", summaryForHuman)
 		log.Fatal(err)
 	}
 
