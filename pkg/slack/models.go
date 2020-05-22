@@ -88,8 +88,9 @@ type User struct {
 }
 
 type Profile struct {
-	DisplayName string `json:"display_name"`
-	Image48     string `json:"image_48"`
+	DisplayName   string `json:"display_name"`
+	ImageOriginal string `json:"image_original"`
+	Image48       string `json:"image_48"`
 }
 
 // https://api.slack.com/interactivity/slash-commands#command_payload_descriptions

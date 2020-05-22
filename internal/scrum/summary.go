@@ -38,7 +38,7 @@ func composeSummaryForHuman(messages []slack.Message, users []slack.User) []inte
 
 		// build blocks
 		nameBlock := slack.BuildSectionBlockWithImage(slack.AddBold(profile.DisplayName),
-			profile.Image48, "thumbnail")
+			profile.ImageOriginal, "thumbnail")
 		blocks = append(blocks, nameBlock)
 
 		beforeTitleBlock := slack.BuildSectionBlock(slack.AddBold(beforeTitle))
