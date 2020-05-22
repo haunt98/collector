@@ -31,13 +31,13 @@ func composeSummaryForHuman(messages []slack.Message, users []slack.User) []inte
 		}
 
 		// get display name
-		name := getDisplayName(msg, users)
-		if name == "" {
+		profile, ok := getProfileOfMessage(msg, users)
+		if !ok || profile.DisplayName == "" {
 			continue
 		}
 
 		// build blocks
-		nameBlock := slack.BuildSectionBlock(slack.AddBold(name))
+		nameBlock := slack.BuildSectionBlockWithImage(slack.AddBold(profile.DisplayName), profile.Image48, "tempo")
 		blocks = append(blocks, nameBlock)
 
 		beforeTitleBlock := slack.BuildSectionBlock(slack.AddBold(beforeTitle))
@@ -91,13 +91,13 @@ func composeSummaryForConfluence(messages []slack.Message, users []slack.User) s
 		}
 
 		// get display name
-		name := getDisplayName(msg, users)
-		if name == "" {
+		profile, ok := getProfileOfMessage(msg, users)
+		if !ok || profile.DisplayName == "" {
 			continue
 		}
 
 		table.Content = append(table.Content, []string{
-			confluence.FormatBold(name), report.before, report.now, report.problem, report.solution,
+			confluence.FormatBold(profile.DisplayName), report.before, report.now, report.problem, report.solution,
 		})
 	}
 
@@ -111,14 +111,14 @@ func processMessage(message slack.Message) string {
 	return result
 }
 
-func getDisplayName(message slack.Message, users []slack.User) string {
+func getProfileOfMessage(message slack.Message, users []slack.User) (slack.Profile, bool) {
 	for _, user := range users {
 		if user.ID == message.User {
-			return user.Profile.DisplayName
+			return user.Profile, true
 		}
 	}
 
-	return ""
+	return slack.Profile{}, false
 }
 
 // abc -> Abc

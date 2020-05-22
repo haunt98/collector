@@ -6,7 +6,7 @@ type MessagePayload struct {
 	Blocks []interface{} `json:"blocks,omitempty"`
 }
 
-type Block struct {
+type BlockType struct {
 	Type string `json:"type"`
 }
 
@@ -14,23 +14,34 @@ const (
 	TypeMarkdown = "mrkdwn"
 	TypeSection  = "section"
 	TypeDivider  = "divider"
+	TypeImage    = "image"
 )
+
+// https://api.slack.com/reference/block-kit/blocks#section
+type SectionBlock struct {
+	BlockType
+
+	Text interface{} `json:"text"`
+	// https://api.slack.com/reference/block-kit/block-elements
+	Accessory interface{} `json:"accessory"`
+}
 
 type TextBlock struct {
 	Type string `json:"type"`
 	Text string `json:"text"`
 }
 
-// https://api.slack.com/reference/block-kit/blocks#section
-type SectionBlock struct {
-	Block
+// https://api.slack.com/reference/block-kit/block-elements#image
+type ImageElement struct {
+	BlockType
 
-	Text interface{} `json:"text"`
+	ImageURL string `json:"image_url"`
+	AltText  string `json:"alt_text"`
 }
 
 // https://api.slack.com/reference/block-kit/blocks#divider
 type DividerBlock struct {
-	Block
+	BlockType
 }
 
 const (
@@ -64,6 +75,7 @@ type Message struct {
 	BotID string `json:"bot_id"`
 }
 
+// https://api.slack.com/types/user
 type UsersResponse struct {
 	Users []User `json:"members"`
 }
@@ -77,6 +89,7 @@ type User struct {
 
 type Profile struct {
 	DisplayName string `json:"display_name"`
+	Image48     string `json:"image_48"`
 }
 
 // https://api.slack.com/interactivity/slash-commands#command_payload_descriptions
