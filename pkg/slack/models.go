@@ -10,7 +10,11 @@ type Block struct {
 	Type string `json:"type"`
 }
 
-const TypeMarkdown = "mrkdwn"
+const (
+	TypeMarkdown = "mrkdwn"
+	TypeSection  = "section"
+	TypeDivider  = "divider"
+)
 
 type TextBlock struct {
 	Type string `json:"type"`
@@ -30,8 +34,8 @@ type DividerBlock struct {
 }
 
 const (
-	ResponseTypeInChannel = "in_channel"
-	ResponseTypeEphemeral = "ephemeral"
+	ResponseTypeInChannel = "in_channel" // everyone can see response
+	ResponseTypeEphemeral = "ephemeral"  // only the one who send message can see response
 )
 
 type MessageRequestByResponseURL struct {

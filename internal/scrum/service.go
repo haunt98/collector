@@ -27,9 +27,10 @@ const (
 	summaryCommand = "summary"
 	wrongCommand   = "Sai câu lệnh rồi anh ơi"
 
-	messageType    = "message"
-	collectMessage = "Update công việc mấy anh ơi :licklick: <!channel>"
-	summaryMessage = "Em xin tổng hợp công việc :licklick: <!channel>"
+	messageType                 = "message"
+	collectMessage              = "Update công việc mấy anh ơi :licklick: <!channel>"
+	summaryForHumanMessage      = "Em xin tổng hợp công việc :licklick: <!channel>"
+	summaryForConfluenceMessage = "Anh nhớ update vào Confluence nhé :licklick:"
 
 	maxLoop = 2
 )
@@ -60,7 +61,7 @@ func (s *Service) HandleGet(ctx *gin.Context) {
 		ts = botMsg.TS
 	}
 
-	summary := s.composeThreadSummary(channel, ts)
+	summary := s.composeThreadSummaryForConfluence(channel, ts)
 
 	ctx.String(http.StatusOK, summary)
 }
@@ -69,11 +70,13 @@ func (s *Service) handleCollect(ctx *gin.Context, payload slack.CommandPayload) 
 	// slack need response as soon as possible
 	ctx.String(http.StatusOK, "")
 
-	if err := s.slackService.PostMessageByResponseURL(
-		payload.ResponseURL,
-		collectMessage,
-		slack.ResponseTypeInChannel,
-	); err != nil {
+	if err := s.slackService.PostMessageByResponseURL(payload.ResponseURL, slack.MessageRequestByResponseURL{
+		MessagePayload: slack.MessagePayload{
+			Text:   collectMessage,
+			Blocks: nil,
+		},
+		ResponseType: slack.ResponseTypeInChannel,
+	}); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -83,19 +86,25 @@ func (s *Service) handleSummary(ctx *gin.Context, payload slack.CommandPayload) 
 	ctx.String(http.StatusOK, "")
 
 	botMsg := s.loopGetHistoryUntil(payload.ChannelID, maxLoop)
-	summary := s.composeThreadSummary(payload.ChannelID, botMsg.TS)
-	summaryExtra := summaryMessage + "\n```\n" + summary + "```"
 
-	if err := s.slackService.PostMessageByResponseURL(
-		payload.ResponseURL,
-		summaryExtra,
-		slack.ResponseTypeInChannel,
-	); err != nil {
+	// Human
+
+	// Confluence
+	summaryForConfluence := s.composeThreadSummaryForConfluence(payload.ChannelID, botMsg.TS)
+	summaryForConfluenceExtra := summaryForConfluenceMessage + "\n```\n" + summaryForConfluence + "```"
+
+	if err := s.slackService.PostMessageByResponseURL(payload.ResponseURL, slack.MessageRequestByResponseURL{
+		MessagePayload: slack.MessagePayload{
+			Text:   summaryForConfluenceExtra,
+			Blocks: nil,
+		},
+		ResponseType: slack.ResponseTypeEphemeral,
+	}); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (s *Service) composeThreadSummary(channel, thread string) string {
+func (s *Service) composeThreadSummaryForConfluence(channel, thread string) string {
 	conversationReplies, err := s.slackService.GetConversationsReplies(s.token, channel, thread)
 	if err != nil {
 		log.Fatal(err)
@@ -106,7 +115,7 @@ func (s *Service) composeThreadSummary(channel, thread string) string {
 		log.Fatal(err)
 	}
 
-	return composeSummary(conversationReplies.Messages, usersList.Users)
+	return composeSummaryForConfluence(conversationReplies.Messages, usersList.Users)
 }
 
 func (s *Service) loopGetHistoryUntil(channel string, max int) (result slack.Message) {

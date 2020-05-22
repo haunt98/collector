@@ -108,14 +108,7 @@ func (c *Service) GetUsersList(token string) (result UsersResponse, err error) {
 }
 
 // https://api.slack.com/interactivity/handling#message_responses
-func (c *Service) PostMessageByResponseURL(responseURL, text, responseType string) error {
-	msgReq := MessageRequestByResponseURL{
-		MessagePayload: MessagePayload{
-			Text: text,
-		},
-		ResponseType: responseType,
-	}
-
+func (c *Service) PostMessageByResponseURL(responseURL string, msgReq MessageRequestByResponseURL) error {
 	body, err := json.Marshal(msgReq)
 	if err != nil {
 		return err
