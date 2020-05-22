@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -129,6 +128,5 @@ func (c *Service) PostMessageByResponseURL(responseURL string, msgReq MessageReq
 		return err
 	}
 
-	log.Println(string(body))
 	return nil
 }

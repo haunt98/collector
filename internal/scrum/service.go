@@ -38,7 +38,7 @@ const (
 func (s *Service) HandlePost(ctx *gin.Context) {
 	var payload slack.CommandPayload
 	if err := ctx.Bind(&payload); err != nil {
-		log.Fatal(err)
+		log.Fatal("failed to bind", err)
 	}
 
 	switch payload.Text {
@@ -77,7 +77,7 @@ func (s *Service) handleCollect(ctx *gin.Context, payload slack.CommandPayload) 
 		},
 		ResponseType: slack.ResponseTypeInChannel,
 	}); err != nil {
-		log.Fatal(err)
+		log.Fatal("failed to post message by response url", err)
 	}
 }
 
@@ -97,9 +97,7 @@ func (s *Service) handleSummary(ctx *gin.Context, payload slack.CommandPayload) 
 		},
 		ResponseType: slack.ResponseTypeInChannel,
 	}); err != nil {
-		log.Print("This is bad")
-		log.Printf("%+v\n", summaryForHuman)
-		log.Fatal(err)
+		log.Fatal("failed to post message by response url", err)
 	}
 
 	// Confluence
@@ -113,19 +111,19 @@ func (s *Service) handleSummary(ctx *gin.Context, payload slack.CommandPayload) 
 		},
 		ResponseType: slack.ResponseTypeEphemeral,
 	}); err != nil {
-		log.Fatal(err)
+		log.Fatal("failed to post message by response url", err)
 	}
 }
 
 func (s *Service) composeThreadSummaryForHuman(channel, thread string) []interface{} {
 	conversationReplies, err := s.slackService.GetConversationsReplies(s.token, channel, thread)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("failed to get conversations replies", err)
 	}
 
 	usersList, err := s.slackService.GetUsersList(s.token)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("failed to get users list", err)
 	}
 
 	return composeSummaryForHuman(conversationReplies.Messages, usersList.Users)
@@ -134,12 +132,12 @@ func (s *Service) composeThreadSummaryForHuman(channel, thread string) []interfa
 func (s *Service) composeThreadSummaryForConfluence(channel, thread string) string {
 	conversationReplies, err := s.slackService.GetConversationsReplies(s.token, channel, thread)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("failed to get conversations replies", err)
 	}
 
 	usersList, err := s.slackService.GetUsersList(s.token)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("failed to get users list", err)
 	}
 
 	return composeSummaryForConfluence(conversationReplies.Messages, usersList.Users)
@@ -150,7 +148,7 @@ func (s *Service) loopGetHistoryUntil(channel string, max int) (result slack.Mes
 	for i := 0; i < max; i += 1 {
 		conversationHistory, err := s.slackService.GetConversationsHistory(s.token, channel, cursor)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("failed to get conversation history", err)
 		}
 
 		for _, msg := range conversationHistory.Messages {

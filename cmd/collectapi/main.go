@@ -35,6 +35,6 @@ func main() {
 	r.GET("/scrum", scrumService.HandleGet)
 
 	if err := r.Run(fmt.Sprintf(":%s", port)); err != nil {
-		log.Fatal(err)
+		log.Fatal("failed to run gin", err)
 	}
 }
