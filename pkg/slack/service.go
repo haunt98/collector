@@ -110,7 +110,7 @@ func (c *Service) GetUsersList(token string) (result UsersResponse, err error) {
 // https://api.slack.com/interactivity/handling#message_responses
 func (c *Service) PostMessageByResponseURL(responseURL, text, responseType string) error {
 	msgReq := WebhookMessageRequest{
-		MessageRequest: MessageRequest{
+		MessagePayload: MessagePayload{
 			Text: text,
 		},
 		ResponseType: responseType,
@@ -138,40 +138,4 @@ func (c *Service) PostMessageByResponseURL(responseURL, text, responseType strin
 
 	log.Println(string(body))
 	return nil
-}
-
-// https://api.slack.com/messaging/webhooks
-func (c *Service) PostMessageByWebhook(webhookURL, text, responseType string) (err error) {
-	msgReq := WebhookMessageRequest{
-		MessageRequest: MessageRequest{
-			Text: text,
-		},
-		ResponseType: responseType,
-	}
-
-	var body []byte
-	body, err = json.Marshal(msgReq)
-	if err != nil {
-		return
-	}
-
-	var req *http.Request
-	req, err = http.NewRequest(http.MethodPost, webhookURL, bytes.NewBuffer(body))
-	if err != nil {
-		return
-	}
-
-	var rsp *http.Response
-	rsp, err = c.client.Do(req)
-	if err != nil {
-		return
-	}
-
-	body, err = ioutil.ReadAll(rsp.Body)
-	if err != nil {
-		return
-	}
-
-	log.Println(string(body))
-	return
 }

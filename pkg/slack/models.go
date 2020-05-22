@@ -1,6 +1,7 @@
 package slack
 
-type MessageRequest struct {
+// https://api.slack.com/reference/messaging/payload
+type MessagePayload struct {
 	Text string `json:"text,omitempty"`
 }
 
@@ -10,16 +11,8 @@ const (
 )
 
 type MessageRequestByResponseURL struct {
-	MessageRequest
+	MessagePayload
 
-	ResponseType string `json:"response_type,omitempty"`
-}
-
-type WebhookMessageRequest struct {
-	MessageRequest
-
-	// https://api.slack.com/interactivity/slash-commands#responding_to_commands
-	// response visibility to slash commands
 	ResponseType string `json:"response_type,omitempty"`
 }
 
