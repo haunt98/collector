@@ -109,6 +109,9 @@ func (c *Service) GetUsersList(token string) (result UsersResponse, err error) {
 
 // https://api.slack.com/interactivity/handling#message_responses
 func (c *Service) PostMessageByResponseURL(responseURL string, msgReq MessageRequestByResponseURL) error {
+	log.Print("XXX")
+	log.Printf("%+v\n", msgReq)
+
 	body, err := json.Marshal(msgReq)
 	if err != nil {
 		return err
