@@ -109,7 +109,7 @@ func (c *Service) GetUsersList(token string) (result UsersResponse, err error) {
 
 // https://api.slack.com/interactivity/handling#message_responses
 func (c *Service) PostMessageByResponseURL(responseURL, text, responseType string) error {
-	msgReq := WebhookMessageRequest{
+	msgReq := MessageRequestByResponseURL{
 		MessagePayload: MessagePayload{
 			Text: text,
 		},

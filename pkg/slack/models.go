@@ -2,22 +2,19 @@ package slack
 
 // https://api.slack.com/reference/messaging/payload
 type MessagePayload struct {
-	Text string `json:"text,omitempty"`
-}
-
-const (
-	ResponseTypeInChannel = "in_channel"
-	ResponseTypeEphemeral = "ephemeral"
-)
-
-type MessageRequestByResponseURL struct {
-	MessagePayload
-
-	ResponseType string `json:"response_type,omitempty"`
+	Text   string        `json:"text,omitempty"`
+	Blocks []interface{} `json:"blocks,omitempty"`
 }
 
 type Block struct {
 	Type string `json:"type"`
+}
+
+const TypeMarkdown = "mrkdwn"
+
+type TextBlock struct {
+	Type string `json:"type"`
+	Text string `json:"text"`
 }
 
 // https://api.slack.com/reference/block-kit/blocks#section
@@ -30,6 +27,17 @@ type SectionBlock struct {
 // https://api.slack.com/reference/block-kit/blocks#divider
 type DividerBlock struct {
 	Block
+}
+
+const (
+	ResponseTypeInChannel = "in_channel"
+	ResponseTypeEphemeral = "ephemeral"
+)
+
+type MessageRequestByResponseURL struct {
+	MessagePayload
+
+	ResponseType string `json:"response_type,omitempty"`
 }
 
 type MessagesResponse struct {
