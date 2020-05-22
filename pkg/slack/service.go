@@ -114,8 +114,6 @@ func (c *Service) PostMessageByResponseURL(responseURL string, msgReq MessageReq
 		return err
 	}
 
-	log.Printf("%+v\n", body)
-
 	req, err := http.NewRequest(http.MethodPost, responseURL, bytes.NewBuffer(body))
 	if err != nil {
 		return err

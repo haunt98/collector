@@ -92,7 +92,7 @@ func (s *Service) handleSummary(ctx *gin.Context, payload slack.CommandPayload) 
 
 	if err := s.slackService.PostMessageByResponseURL(payload.ResponseURL, slack.MessageRequestByResponseURL{
 		MessagePayload: slack.MessagePayload{
-			Text:   "hihi",
+			Text:   "",
 			Blocks: summaryForHuman,
 		},
 		ResponseType: slack.ResponseTypeInChannel,
