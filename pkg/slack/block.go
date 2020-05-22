@@ -20,7 +20,10 @@ func BuildSectionBlockWithImage(text, imageURL, imageAltText string) SectionBloc
 		BlockType: BlockType{
 			Type: TypeSection,
 		},
-		Text: text,
+		Text: TextBlock{
+			Type: TypeMarkdown,
+			Text: text,
+		},
 		Accessory: ImageElement{
 			BlockType: BlockType{
 				Type: TypeImage,
