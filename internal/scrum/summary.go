@@ -67,6 +67,8 @@ func composeSummaryForHuman(messages []slack.Message, users []slack.User) []inte
 			solutionContentBlock := slack.BuildSectionBlock(report.solution)
 			blocks = append(blocks, solutionContentBlock)
 		}
+
+		blocks = append(blocks, slack.BuildDividerBlock())
 	}
 
 	return blocks
