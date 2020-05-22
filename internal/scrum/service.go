@@ -69,7 +69,7 @@ func (s *Service) handleCollect(ctx *gin.Context, payload slack.CommandPayload) 
 	// slack need response as soon as possible
 	ctx.String(http.StatusOK, "")
 
-	if err := s.slackService.PostMessageByWebhook(
+	if err := s.slackService.PostMessageByResponseURL(
 		payload.ResponseURL,
 		collectMessage,
 		slack.ResponseTypeInChannel,
@@ -86,7 +86,7 @@ func (s *Service) handleSummary(ctx *gin.Context, payload slack.CommandPayload) 
 	summary := s.composeThreadSummary(payload.ChannelID, botMsg.TS)
 	summaryExtra := summaryMessage + "\n```\n" + summary + "```"
 
-	if err := s.slackService.PostMessageByWebhook(
+	if err := s.slackService.PostMessageByResponseURL(
 		payload.ResponseURL,
 		summaryExtra,
 		slack.ResponseTypeInChannel,

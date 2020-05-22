@@ -9,12 +9,34 @@ const (
 	ResponseTypeEphemeral = "ephemeral"
 )
 
+type MessageRequestByResponseURL struct {
+	MessageRequest
+
+	ResponseType string `json:"response_type,omitempty"`
+}
+
 type WebhookMessageRequest struct {
 	MessageRequest
 
 	// https://api.slack.com/interactivity/slash-commands#responding_to_commands
 	// response visibility to slash commands
 	ResponseType string `json:"response_type,omitempty"`
+}
+
+type Block struct {
+	Type string `json:"type"`
+}
+
+// https://api.slack.com/reference/block-kit/blocks#section
+type SectionBlock struct {
+	Block
+
+	Text interface{} `json:"text"`
+}
+
+// https://api.slack.com/reference/block-kit/blocks#divider
+type DividerBlock struct {
+	Block
 }
 
 type MessagesResponse struct {
