@@ -13,6 +13,7 @@ const (
 	nowTitle      = "Công việc hôm nay"
 	problemTitle  = "Khó khăn"
 	solutionTitle = "Giải pháp"
+	comradeTitle  = "Đồng chí"
 
 	// before, now, problem, solution
 	reportNumbers = 4
@@ -37,7 +38,7 @@ func composeSummaryForHuman(messages []slack.Message, users []slack.User) []inte
 		}
 
 		// build blocks
-		nameBlock := slack.BuildSectionBlock(slack.AddBold(profile.DisplayName))
+		nameBlock := slack.BuildSectionBlock(comradeTitle + " " + slack.AddBold(profile.DisplayName))
 		blocks = append(blocks, nameBlock)
 
 		beforeTitleBlock := slack.BuildSectionBlock(slack.AddBold(beforeTitle))
