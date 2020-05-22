@@ -88,6 +88,17 @@ func (s *Service) handleSummary(ctx *gin.Context, payload slack.CommandPayload) 
 	botMsg := s.loopGetHistoryUntil(payload.ChannelID, maxLoop)
 
 	// Human
+	summaryForHuman := s.composeThreadSummaryForHuman(payload.ChannelID, botMsg.TS)
+
+	if err := s.slackService.PostMessageByResponseURL(payload.ResponseURL, slack.MessageRequestByResponseURL{
+		MessagePayload: slack.MessagePayload{
+			Text:   "",
+			Blocks: summaryForHuman,
+		},
+		ResponseType: "",
+	}); err != nil {
+		log.Fatal(err)
+	}
 
 	// Confluence
 	summaryForConfluence := s.composeThreadSummaryForConfluence(payload.ChannelID, botMsg.TS)
@@ -102,6 +113,20 @@ func (s *Service) handleSummary(ctx *gin.Context, payload slack.CommandPayload) 
 	}); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func (s *Service) composeThreadSummaryForHuman(channel, thread string) []interface{} {
+	conversationReplies, err := s.slackService.GetConversationsReplies(s.token, channel, thread)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	usersList, err := s.slackService.GetUsersList(s.token)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return composeSummaryForHuman(conversationReplies.Messages, usersList.Users)
 }
 
 func (s *Service) composeThreadSummaryForConfluence(channel, thread string) string {
