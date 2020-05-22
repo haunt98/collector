@@ -23,7 +23,7 @@ type SectionBlock struct {
 
 	Text interface{} `json:"text"`
 	// https://api.slack.com/reference/block-kit/block-elements
-	Accessory interface{} `json:"accessory"`
+	Accessory interface{} `json:"accessory,omitempty"`
 }
 
 type TextBlock struct {
