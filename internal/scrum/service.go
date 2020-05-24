@@ -51,21 +51,6 @@ func (s *Service) HandlePost(ctx *gin.Context) {
 	}
 }
 
-func (s *Service) HandleGet(ctx *gin.Context) {
-	channel := ctx.Query("channel")
-	ts := ctx.Query("ts")
-
-	// If empty thread, get latest thread in channel
-	if len(ts) == 0 {
-		botMsg := s.loopGetHistoryUntil(channel, maxLoop)
-		ts = botMsg.TS
-	}
-
-	summary := s.composeThreadSummaryForConfluence(channel, ts)
-
-	ctx.String(http.StatusOK, summary)
-}
-
 func (s *Service) handleCollect(ctx *gin.Context, payload slack.CommandPayload) {
 	// slack need response as soon as possible
 	ctx.String(http.StatusOK, "")
@@ -87,32 +72,77 @@ func (s *Service) handleSummary(ctx *gin.Context, payload slack.CommandPayload) 
 
 	botMsg := s.loopGetHistoryUntil(payload.ChannelID, maxLoop)
 
-	// Human
-	summaryForHuman := s.composeThreadSummaryForHuman(payload.ChannelID, botMsg.TS)
+	humanSummary, confluenceSummary, err := s.composeThreadSummary(payload.ChannelID, botMsg.TS)
+	if err != nil {
+		log.Fatal("failed to compose thread summary", err)
+	}
 
 	if err := s.slackService.PostMessageByResponseURL(payload.ResponseURL, slack.MessageRequestByResponseURL{
 		MessagePayload: slack.MessagePayload{
 			Text:   "",
-			Blocks: summaryForHuman,
+			Blocks: humanSummary,
 		},
 		ResponseType: slack.ResponseTypeInChannel,
 	}); err != nil {
 		log.Fatal("failed to post message by response url", err)
 	}
 
-	// Confluence
-	summaryForConfluence := s.composeThreadSummaryForConfluence(payload.ChannelID, botMsg.TS)
-	summaryForConfluenceExtra := summaryForConfluenceMessage + "\n```\n" + summaryForConfluence + "```"
-
 	if err := s.slackService.PostMessageByResponseURL(payload.ResponseURL, slack.MessageRequestByResponseURL{
 		MessagePayload: slack.MessagePayload{
-			Text:   summaryForConfluenceExtra,
+			Text:   confluenceSummary,
 			Blocks: nil,
 		},
 		ResponseType: slack.ResponseTypeEphemeral,
 	}); err != nil {
 		log.Fatal("failed to post message by response url", err)
 	}
+
+	//// Human
+	//summaryForHuman := s.composeThreadSummaryForHuman(payload.ChannelID, botMsg.TS)
+	//
+	//if err := s.slackService.PostMessageByResponseURL(payload.ResponseURL, slack.MessageRequestByResponseURL{
+	//	MessagePayload: slack.MessagePayload{
+	//		Text:   "",
+	//		Blocks: summaryForHuman,
+	//	},
+	//	ResponseType: slack.ResponseTypeInChannel,
+	//}); err != nil {
+	//	log.Fatal("failed to post message by response url", err)
+	//}
+	//
+	//// Confluence
+	//summaryForConfluence := s.composeThreadSummaryForConfluence(payload.ChannelID, botMsg.TS)
+	//summaryForConfluenceExtra := summaryForConfluenceMessage + "\n```\n" + summaryForConfluence + "```"
+	//
+	//if err := s.slackService.PostMessageByResponseURL(payload.ResponseURL, slack.MessageRequestByResponseURL{
+	//	MessagePayload: slack.MessagePayload{
+	//		Text:   summaryForConfluenceExtra,
+	//		Blocks: nil,
+	//	},
+	//	ResponseType: slack.ResponseTypeEphemeral,
+	//}); err != nil {
+	//	log.Fatal("failed to post message by response url", err)
+	//}
+}
+
+func (s *Service) composeThreadSummary(channel, thread string) (
+	humanSummary []interface{}, confluenceSummary string, err error) {
+	var conversationReplies slack.MessagesResponse
+	conversationReplies, err = s.slackService.GetConversationsReplies(s.token, channel, thread)
+	if err != nil {
+		// log.Fatal("failed to get conversations replies", err)
+		return
+	}
+
+	var usersList slack.UsersResponse
+	usersList, err = s.slackService.GetUsersList(s.token)
+	if err != nil {
+		// log.Fatal("failed to get users list", err)
+		return
+	}
+
+	humanSummary, confluenceSummary = composeSummary(conversationReplies.Messages, usersList.Users)
+	return
 }
 
 func (s *Service) composeThreadSummaryForHuman(channel, thread string) []interface{} {

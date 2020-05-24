@@ -32,7 +32,6 @@ func main() {
 	r := gin.Default()
 
 	r.POST("/scrum", scrumService.HandlePost)
-	r.GET("/scrum", scrumService.HandleGet)
 
 	if err := r.Run(fmt.Sprintf(":%s", port)); err != nil {
 		log.Fatal("failed to run gin", err)

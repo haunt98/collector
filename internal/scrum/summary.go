@@ -3,7 +3,6 @@ package scrum
 import (
 	"collector/pkg/confluence"
 	"collector/pkg/slack"
-	"log"
 	"regexp"
 	"strings"
 )
@@ -20,21 +19,61 @@ const (
 	reportNumbers = 4
 )
 
-func composeSummary(msgs []slack.Message, users []slack.User) (human []interface{}, confluence string) {
-	human = make([]interface{}, 0, len(msgs)*reportNumbers)
+func composeSummary(messages []slack.Message, users []slack.User) (humanSummary []interface{}, confluenceSummary string) {
+	humanSummary = make([]interface{}, 0, len(messages)*reportNumbers)
 
-	for _, msg := range msgs {
-		input := processMessage(msg)
+	var table confluence.Table
+	table.Headers = []string{domainTitle, beforeTitle, nowTitle, problemTitle, solutionTitle}
+	table.Content = make([][]string, 0, len(messages))
 
-		report, ok := composeReport(input)
+	for _, msg := range messages {
+		profile, ok := getProfileOfMessage(msg, users)
+		if !ok || profile.DisplayName == "" {
+			continue
+		}
+
+		// human
+		processedMsg := processMessage(msg)
+		humanReport, ok := composeReport(processedMsg)
 		if !ok {
 			continue
 		}
 
-		log.Print(report)
+		humanMsg := slack.AddBold(comradeTitle) + " " + slack.AddBold(profile.DisplayName) + "\n" +
+			slack.AddBold(beforeTitle) + ":" + "\n" +
+			humanReport.before + "\n" +
+			slack.AddBold(nowTitle) + ":" + "\n" +
+			humanReport.now + "\n"
+
+		if humanReport.problem != "" {
+			humanMsg += slack.AddBold(problemTitle) + ":" + "\n" +
+				humanReport.problem
+		}
+
+		if humanReport.solution != "" {
+			humanMsg += slack.AddBold(solutionTitle) + ":" + "\n" +
+				humanReport.solution
+		}
+
+		humanSummary = append(humanSummary, slack.BuildSectionBlock(humanMsg))
+		humanSummary = append(humanSummary, slack.BuildDividerBlock())
+
+		// confluence
+		confluenceMsg := slack2confluence(processedMsg, users)
+		confluenceReport, ok := composeReport(confluenceMsg)
+		if !ok {
+			continue
+		}
+
+		table.Content = append(table.Content, []string{
+			confluence.FormatBold(profile.DisplayName),
+			confluenceReport.before, confluenceReport.now,
+			confluenceReport.problem, confluenceReport.solution,
+		})
 	}
 
-	return human, ""
+	confluenceSummary = confluence.ComposeTableFormat(table)
+	return
 }
 
 func composeSummaryForHuman(messages []slack.Message, users []slack.User) []interface{} {
@@ -49,63 +88,28 @@ func composeSummaryForHuman(messages []slack.Message, users []slack.User) []inte
 			continue
 		}
 
-		// get display name
 		profile, ok := getProfileOfMessage(msg, users)
 		if !ok || profile.DisplayName == "" {
 			continue
 		}
 
-		displayText := comradeTitle + " " + slack.AddBold(profile.DisplayName) + "\n" +
-			slack.AddBold(beforeTitle) + "\n" +
+		displayText := slack.AddBold(comradeTitle) + " " + slack.AddBold(profile.DisplayName) + "\n" +
+			slack.AddBold(beforeTitle) + ":" + "\n" +
 			report.before + "\n" +
-			slack.AddBold(nowTitle) + "\n" +
+			slack.AddBold(nowTitle) + ":" + "\n" +
 			report.now + "\n"
 
 		if report.problem != "" {
-			displayText += slack.AddBold(problemTitle) + "\n" +
+			displayText += slack.AddBold(problemTitle) + ":" + "\n" +
 				report.problem
 		}
 
 		if report.solution != "" {
-			displayText += slack.AddBold(solutionTitle) + "\n" +
+			displayText += slack.AddBold(solutionTitle) + ":" + "\n" +
 				report.solution
 		}
 
-		blocks = append(blocks, slack.BuildSectionBlockWithImage(displayText,
-			profile.ImageOriginal, "uhm"))
-
-		// build blocks
-		//nameBlock := slack.BuildSectionBlock(comradeTitle + " " + slack.AddBold(profile.DisplayName))
-		//blocks = append(blocks, nameBlock)
-		//
-		//beforeTitleBlock := slack.BuildSectionBlock(slack.AddBold(beforeTitle))
-		//blocks = append(blocks, beforeTitleBlock)
-		//
-		//beforeContentBlock := slack.BuildSectionBlock(report.before)
-		//blocks = append(blocks, beforeContentBlock)
-		//
-		//nowTitleBlock := slack.BuildSectionBlock(slack.AddBold(nowTitle))
-		//blocks = append(blocks, nowTitleBlock)
-		//
-		//nowContentBlock := slack.BuildSectionBlock(report.now)
-		//blocks = append(blocks, nowContentBlock)
-		//
-		//if report.problem != "" {
-		//	problemTitleBlock := slack.BuildSectionBlock(slack.AddBold(problemTitle))
-		//	blocks = append(blocks, problemTitleBlock)
-		//
-		//	problemContentBlock := slack.BuildSectionBlock(report.problem)
-		//	blocks = append(blocks, problemContentBlock)
-		//}
-		//
-		//if report.solution != "" {
-		//	solutionTitleBlock := slack.BuildSectionBlock(slack.AddBold(solutionTitle))
-		//	blocks = append(blocks, solutionTitleBlock)
-		//
-		//	solutionContentBlock := slack.BuildSectionBlock(report.solution)
-		//	blocks = append(blocks, solutionContentBlock)
-		//}
-
+		blocks = append(blocks, slack.BuildSectionBlock(displayText))
 		blocks = append(blocks, slack.BuildDividerBlock())
 	}
 
