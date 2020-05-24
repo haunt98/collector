@@ -74,9 +74,10 @@ func (s *Service) handleSummary(ctx *gin.Context, payload slack.CommandPayload) 
 		log.Fatal("failed to compose thread summary", err)
 	}
 
+	// human
 	if err := s.slackService.PostMessageByResponseURL(payload.ResponseURL, slack.MessageRequestByResponseURL{
 		MessagePayload: slack.MessagePayload{
-			Text:   humanMessageIntro + " " + slack.MentionChannel,
+			Text:   humanMessageIntro,
 			Blocks: humanSummary,
 		},
 		ResponseType: slack.ResponseTypeInChannel,
@@ -84,6 +85,7 @@ func (s *Service) handleSummary(ctx *gin.Context, payload slack.CommandPayload) 
 		log.Fatal("failed to post message by response url", err)
 	}
 
+	// confluence
 	if err := s.slackService.PostMessageByResponseURL(payload.ResponseURL, slack.MessageRequestByResponseURL{
 		MessagePayload: slack.MessagePayload{
 			Text:   confluenceSummary,

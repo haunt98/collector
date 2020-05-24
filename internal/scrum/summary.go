@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	humanMessageIntro   = "Em tổng hợp công việc hôm nay"
-	summaryMessageIntro = "Anh nhớ update vào Confluence nhé"
+	humanMessageIntro   = "Em tổng hợp công việc hôm nay " + slack.MentionChannel
+	summaryMessageIntro = "Anh update vào Confluence nha"
 
 	domainTitle   = "Domain"
 	beforeTitle   = "Công việc hôm qua"
@@ -31,9 +31,12 @@ func composeSummary(messages []slack.Message, users []slack.User) (humanSummary 
 	table.Headers = []string{domainTitle, beforeTitle, nowTitle, problemTitle, solutionTitle}
 	table.Content = make([][]string, 0, len(messages))
 
+	// only tag last one
+	var lastUserID string
+
 	for _, msg := range messages {
-		profile, ok := getProfileOfMessage(msg, users)
-		if !ok || profile.DisplayName == "" {
+		user, ok := getMessageOwner(msg, users)
+		if !ok || user.Profile.DisplayName == "" {
 			continue
 		}
 
@@ -44,7 +47,7 @@ func composeSummary(messages []slack.Message, users []slack.User) (humanSummary 
 			continue
 		}
 
-		humanMsg := slack.AddBold(comradeTitle) + " " + slack.AddBold(profile.DisplayName) + "\n" +
+		humanMsg := slack.AddBold(comradeTitle) + " " + slack.AddBold(user.Profile.DisplayName) + "\n" +
 			slack.AddBold(beforeTitle) + ":" + "\n" +
 			humanReport.before + "\n" +
 			slack.AddBold(nowTitle) + ":" + "\n" +
@@ -71,13 +74,15 @@ func composeSummary(messages []slack.Message, users []slack.User) (humanSummary 
 		}
 
 		table.Content = append(table.Content, []string{
-			confluence.FormatBold(profile.DisplayName),
+			confluence.FormatBold(user.Profile.DisplayName),
 			confluenceReport.before, confluenceReport.now,
 			confluenceReport.problem, confluenceReport.solution,
 		})
+
+		lastUserID = user.ID
 	}
 
-	confluenceSummary = summaryMessageIntro + "\n" +
+	confluenceSummary = summaryMessageIntro + " nha anh " + slack.MentionUser(lastUserID) + "\n" +
 		confluence.ComposeTableFormat(table)
 	return
 }
@@ -89,14 +94,17 @@ func processMessage(message slack.Message) string {
 	return result
 }
 
-func getProfileOfMessage(message slack.Message, users []slack.User) (slack.Profile, bool) {
+func getMessageOwner(message slack.Message, users []slack.User) (result slack.User, ok bool) {
 	for _, user := range users {
 		if user.ID == message.User {
-			return user.Profile, true
+			result = user
+			ok = true
+			return
 		}
 	}
 
-	return slack.Profile{}, false
+	ok = false
+	return
 }
 
 // abc -> Abc
