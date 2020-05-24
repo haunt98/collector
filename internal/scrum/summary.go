@@ -82,8 +82,11 @@ func composeSummary(messages []slack.Message, users []slack.User) (humanSummary 
 		lastUserID = user.ID
 	}
 
-	confluenceSummary = summaryMessageIntro + " nha anh " + slack.MentionUser(lastUserID) + "\n" +
-		confluence.ComposeTableFormat(table)
+	// at least 1 comrade report
+	if lastUserID != "" {
+		confluenceSummary = summaryMessageIntro + " nha anh " + slack.MentionUser(lastUserID) + "\n" +
+			confluence.ComposeTableFormat(table)
+	}
 	return
 }
 
