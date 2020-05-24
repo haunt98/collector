@@ -57,12 +57,12 @@ func composeSummary(messages []slack.Message, users []slack.User) (humanSummary 
 
 		if humanReport.problem != "" {
 			humanMsg += slack.AddBold(problemTitle) + ":" + "\n" +
-				humanReport.problem
+				humanReport.problem + "\n"
 		}
 
 		if humanReport.solution != "" {
 			humanMsg += slack.AddBold(solutionTitle) + ":" + "\n" +
-				humanReport.solution
+				humanReport.solution + "\n"
 		}
 
 		humanSummary = append(humanSummary, slack.BuildSectionBlock(humanMsg))
@@ -91,10 +91,10 @@ func composeSummary(messages []slack.Message, users []slack.User) (humanSummary 
 
 	// at least 1 comrade report -> enable confluence
 	if lastUserID != "" {
-		confluenceSummary = summaryMessageIntro + " nha anh " + slack.MentionUser(lastUserID) + "\n" +
+		confluenceSummary = summaryMessageIntro + " anh " + slack.MentionUser(lastUserID) + "\n" +
 			"```\n" +
 			confluence.ComposeTableFormat(table) +
-			"```"
+			"```\n"
 	}
 	return
 }
