@@ -25,12 +25,9 @@ func NewService(slackService *slack.Service, token, botID string) *Service {
 const (
 	collectCommand = "collect"
 	summaryCommand = "summary"
-	wrongCommand   = "Sai câu lệnh rồi anh ơi"
 
-	messageType                 = "message"
-	collectMessage              = "Update công việc mấy anh ơi :licklick: <!channel>"
-	summaryForHumanMessage      = "Em xin tổng hợp công việc :licklick: <!channel>"
-	summaryForConfluenceMessage = "Anh nhớ update vào Confluence nhé :licklick:"
+	wrongMessage   = "Sai câu lệnh rồi anh ơi"
+	collectMessage = "Update công việc mấy anh ơi :licklick: <!channel>"
 
 	maxLoop = 2
 )
@@ -47,7 +44,7 @@ func (s *Service) HandlePost(ctx *gin.Context) {
 	case summaryCommand:
 		s.handleSummary(ctx, payload)
 	default:
-		ctx.String(http.StatusOK, wrongCommand)
+		ctx.String(http.StatusOK, wrongMessage)
 	}
 }
 
@@ -79,7 +76,7 @@ func (s *Service) handleSummary(ctx *gin.Context, payload slack.CommandPayload) 
 
 	if err := s.slackService.PostMessageByResponseURL(payload.ResponseURL, slack.MessageRequestByResponseURL{
 		MessagePayload: slack.MessagePayload{
-			Text:   "",
+			Text:   humanMessageIntro,
 			Blocks: humanSummary,
 		},
 		ResponseType: slack.ResponseTypeInChannel,
@@ -127,7 +124,7 @@ func (s *Service) loopGetHistoryUntil(channel string, max int) (result slack.Mes
 		}
 
 		for _, msg := range conversationHistory.Messages {
-			if msg.Type == messageType && msg.Text == collectMessage && msg.BotID == s.botID {
+			if msg.Type == slack.TypeMessage && msg.Text == collectMessage && msg.BotID == s.botID {
 				result = msg
 				return
 			}

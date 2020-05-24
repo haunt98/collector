@@ -8,6 +8,9 @@ import (
 )
 
 const (
+	humanMessageIntro   = "Em tổng hợp công việc hôm nay"
+	summaryMessageIntro = "Anh nhớ update vào Confluence nhé"
+
 	domainTitle   = "Domain"
 	beforeTitle   = "Công việc hôm qua"
 	nowTitle      = "Công việc hôm nay"
@@ -21,6 +24,8 @@ const (
 
 func composeSummary(messages []slack.Message, users []slack.User) (humanSummary []interface{}, confluenceSummary string) {
 	humanSummary = make([]interface{}, 0, len(messages)*reportNumbers)
+	humanSummary = append(humanSummary, slack.BuildSectionBlock(humanMessageIntro))
+	humanSummary = append(humanSummary, slack.BuildDividerBlock())
 
 	var table confluence.Table
 	table.Headers = []string{domainTitle, beforeTitle, nowTitle, problemTitle, solutionTitle}
@@ -72,7 +77,8 @@ func composeSummary(messages []slack.Message, users []slack.User) (humanSummary 
 		})
 	}
 
-	confluenceSummary = confluence.ComposeTableFormat(table)
+	confluenceSummary = summaryMessageIntro + "\n" +
+		confluence.ComposeTableFormat(table)
 	return
 }
 

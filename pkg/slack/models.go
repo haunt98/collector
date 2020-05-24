@@ -1,5 +1,9 @@
 package slack
 
+const (
+	TagChannel = "<!channel>"
+)
+
 // https://api.slack.com/reference/messaging/payload
 type MessagePayload struct {
 	Text   string        `json:"text,omitempty"`
@@ -63,6 +67,8 @@ type MessagesResponse struct {
 type ResponseMetadata struct {
 	NextCursor string `json:"next_cursor"`
 }
+
+const TypeMessage = "message"
 
 type Message struct {
 	Type string `json:"type"`
