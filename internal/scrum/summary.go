@@ -11,6 +11,8 @@ const (
 	humanMessageIntro   = "Em tổng hợp công việc hôm nay " + slack.MentionChannel
 	summaryMessageIntro = "Anh update vào Confluence nha"
 
+	humanEmptyMessage = "Oh, hôm nay không có report"
+
 	domainTitle   = "Domain"
 	beforeTitle   = "Công việc hôm qua"
 	nowTitle      = "Công việc hôm nay"
@@ -82,10 +84,17 @@ func composeSummary(messages []slack.Message, users []slack.User) (humanSummary 
 		lastUserID = user.ID
 	}
 
-	// at least 1 comrade report
+	// no comrades -> disable human
+	if len(humanSummary) <= 2 {
+		humanSummary = append(humanSummary, slack.BuildSectionBlock(humanEmptyMessage))
+	}
+
+	// at least 1 comrade report -> enable confluence
 	if lastUserID != "" {
 		confluenceSummary = summaryMessageIntro + " nha anh " + slack.MentionUser(lastUserID) + "\n" +
-			confluence.ComposeTableFormat(table)
+			"```\n" +
+			confluence.ComposeTableFormat(table) +
+			"```"
 	}
 	return
 }
