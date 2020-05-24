@@ -91,7 +91,7 @@ func (s *Service) handleSummary(ctx *gin.Context, payload slack.CommandPayload) 
 			Text:   confluenceSummary,
 			Blocks: nil,
 		},
-		ResponseType: slack.ResponseTypeEphemeral,
+		ResponseType: slack.ResponseTypeInChannel,
 	}); err != nil {
 		log.Fatal("failed to post message by response url", err)
 	}
