@@ -14,3 +14,9 @@ func RemoveBold(input string) string {
 func AddBold(input string) string {
 	return fmt.Sprintf("*%s*", input)
 }
+
+const MentionChannel = "<!channel>"
+
+func MentionUser(id string) string {
+	return fmt.Sprintf("<@%s>", id)
+}

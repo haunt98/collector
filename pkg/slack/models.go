@@ -1,9 +1,5 @@
 package slack
 
-const (
-	TagChannel = "<!channel>"
-)
-
 // https://api.slack.com/reference/messaging/payload
 type MessagePayload struct {
 	Text   string        `json:"text,omitempty"`

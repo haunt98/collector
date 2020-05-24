@@ -27,7 +27,7 @@ const (
 	summaryCommand = "summary"
 
 	wrongMessage   = "Sai câu lệnh rồi anh ơi"
-	collectMessage = "Update công việc mấy anh ơi :licklick: <!channel>"
+	collectMessage = "Update công việc mấy anh ơi"
 
 	maxLoop = 2
 )
@@ -54,7 +54,7 @@ func (s *Service) handleCollect(ctx *gin.Context, payload slack.CommandPayload) 
 
 	if err := s.slackService.PostMessageByResponseURL(payload.ResponseURL, slack.MessageRequestByResponseURL{
 		MessagePayload: slack.MessagePayload{
-			Text:   collectMessage,
+			Text:   collectMessage + " " + slack.MentionChannel,
 			Blocks: nil,
 		},
 		ResponseType: slack.ResponseTypeInChannel,
@@ -76,7 +76,7 @@ func (s *Service) handleSummary(ctx *gin.Context, payload slack.CommandPayload) 
 
 	if err := s.slackService.PostMessageByResponseURL(payload.ResponseURL, slack.MessageRequestByResponseURL{
 		MessagePayload: slack.MessagePayload{
-			Text:   humanMessageIntro,
+			Text:   humanMessageIntro + " " + slack.MentionChannel,
 			Blocks: humanSummary,
 		},
 		ResponseType: slack.ResponseTypeInChannel,
