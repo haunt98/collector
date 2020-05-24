@@ -3,7 +3,6 @@ package scrum
 import (
 	"collector/pkg/confluence"
 	"collector/pkg/slack"
-	"log"
 	"regexp"
 	"strings"
 )
@@ -37,7 +36,6 @@ func composeSummary(messages []slack.Message, users []slack.User) (humanSummary 
 
 	for _, msg := range messages {
 		user, ok := getMessageOwner(msg, users)
-		log.Printf("Owner %+v\n", user)
 		if !ok || user.Profile.DisplayName == "" {
 			continue
 		}
