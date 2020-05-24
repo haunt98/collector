@@ -97,9 +97,7 @@ func processMessage(message slack.Message) string {
 func getMessageOwner(message slack.Message, users []slack.User) (result slack.User, ok bool) {
 	for _, user := range users {
 		if user.ID == message.User {
-			result = user
-			ok = true
-			return
+			return user, true
 		}
 	}
 
