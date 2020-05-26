@@ -26,7 +26,7 @@ const (
 func (c *Service) GetConversationsHistory(token, channel, cursor string) (result MessagesResponse, err error) {
 	url := fmt.Sprintf("%s/conversations.history?token=%s&channel=%s",
 		baseURL, token, channel)
-	if len(cursor) != 0 {
+	if cursor == "" {
 		url += fmt.Sprintf("&cursor=%s", cursor)
 	}
 

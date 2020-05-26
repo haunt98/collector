@@ -1,6 +1,7 @@
 package slack
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 )
@@ -69,4 +70,8 @@ func ExtractLinks(input string) ([]Link, bool) {
 	}
 
 	return nil, false
+}
+
+func CreateLink(url, description string) string {
+	return fmt.Sprintf("<%s|%s>", url, description)
 }

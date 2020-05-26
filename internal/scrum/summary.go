@@ -3,14 +3,15 @@ package scrum
 import (
 	"collector/pkg/confluence"
 	"collector/pkg/slack"
+	"fmt"
+	"log"
+	"os"
 	"regexp"
 	"strings"
 )
 
 const (
-	humanMessageIntro   = "Em tổng hợp công việc hôm nay " + slack.MentionChannel
-	summaryMessageIntro = "Anh update vào Confluence nha"
-
+	humanMessageIntro = "Em tổng hợp công việc hôm nay " + slack.MentionChannel
 	humanEmptyMessage = "Oh, hôm nay không có report"
 
 	domainTitle   = "Domain"
@@ -91,7 +92,14 @@ func composeSummary(messages []slack.Message, users []slack.User) (humanSummary 
 
 	// at least 1 comrade report -> enable confluence
 	if lastUserID != "" {
-		confluenceSummary = summaryMessageIntro + " anh " + slack.MentionUser(lastUserID) + "\n" +
+		confluenceURL := os.Getenv("CONFLUENCE_LINK")
+		if confluenceURL == "" {
+			log.Fatal("missing confluence link")
+		}
+
+		confluenceSummary = fmt.Sprintf("Anh update vào %s nha",
+			slack.CreateLink(confluenceURL, "Confluence")) +
+			" anh " + slack.MentionUser(lastUserID) + "\n" +
 			"```\n" +
 			confluence.ComposeTableFormat(table) +
 			"```\n"

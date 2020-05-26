@@ -12,18 +12,18 @@ import (
 
 func main() {
 	port := os.Getenv("PORT")
-	if len(port) == 0 {
+	if port == "" {
 		log.Fatal("PORT is empty")
 	}
 	log.Printf("PORT is %s\n", port)
 
 	token := os.Getenv("TOKEN")
-	if len(token) == 0 {
+	if token == "" {
 		log.Fatal("TOKEN is empty")
 	}
 
 	botID := os.Getenv("BOT_ID")
-	if len(botID) == 0 {
+	if botID == "" {
 		log.Fatal("BOT_ID is empty")
 	}
 
