@@ -92,7 +92,7 @@ func composeSummary(messages []slack.Message, users []slack.User) (humanSummary 
 
 	// at least 1 comrade report -> enable confluence
 	if lastUserID != "" {
-		confluenceURL := os.Getenv("CONFLUENCE_LINK")
+		confluenceURL := os.Getenv("CONFLUENCE_URL")
 		if confluenceURL == "" {
 			log.Fatal("missing confluence link")
 		}
