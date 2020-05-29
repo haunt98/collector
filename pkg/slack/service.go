@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/dghubble/sling"
@@ -35,7 +36,7 @@ func (s *Service) GetConversationsHistory(token, channel, cursor string) (result
 	}
 
 	var req *http.Request
-	req, err = s.sl.New().Get("/conversations.history").
+	req, err = sling.New().Get("https://slack.com/api/conversations.history").
 		QueryStruct(Params{
 			Token:   token,
 			Channel: channel,
@@ -140,6 +141,8 @@ func (s *Service) Do(req *http.Request, result interface{}) error {
 	if err != nil {
 		return err
 	}
+
+	log.Printf("XXX %s", string(body))
 
 	if err = json.Unmarshal(body, result); err != nil {
 		return err
