@@ -5,58 +5,53 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 
 	"github.com/dghubble/sling"
 )
 
+const (
+	baseURL = "https://slack.com/api"
+)
+
 type Service struct {
 	client *http.Client
+	sl     *sling.Sling
 }
 
 func NewService() *Service {
 	return &Service{
 		client: &http.Client{},
+		sl:     sling.New().Base(baseURL),
 	}
 }
 
-const (
-	baseURL = "https://slack.com/api"
-)
-
 // https://api.slack.com/methods/conversations.history
-func (c *Service) GetConversationsHistory(token, channel, cursor string) (result MessagesResponse, err error) {
+func (s *Service) GetConversationsHistory(token, channel, cursor string) (result MessagesResponse, err error) {
 	type Params struct {
 		Token   string `json:"token,omitempty"`
 		Channel string `json:"channel,omitempty"`
 		Cursor  string `json:"cursor,omitempty"`
 	}
 
-	log.Println(channel)
-	log.Println(cursor)
-
-	resultPointer := new(MessagesResponse)
-	rsp, err := sling.New().Get(baseURL + "/conversations.history").
+	var req *http.Request
+	req, err = s.sl.Get("/conversations.history").
 		QueryStruct(Params{
 			Token:   token,
 			Channel: channel,
 			Cursor:  cursor,
 		}).
-		ReceiveSuccess(resultPointer)
+		Request()
 	if err != nil {
 		return
 	}
 
-	log.Printf("XXX %+v\n", resultPointer)
-	log.Printf("YYY %+v\n", rsp)
-
-	result = *resultPointer
+	err = s.Do(req, &result)
 	return
 }
 
 // https://api.slack.com/methods/conversations.replies
-func (c *Service) GetConversationsReplies(token, channel, threadTS string) (result MessagesResponse, err error) {
+func (s *Service) GetConversationsReplies(token, channel, threadTS string) (result MessagesResponse, err error) {
 	url := fmt.Sprintf("%s/conversations.replies?token=%s&channel=%s&ts=%s",
 		baseURL, token, channel, threadTS)
 
@@ -67,7 +62,7 @@ func (c *Service) GetConversationsReplies(token, channel, threadTS string) (resu
 	}
 
 	var rsp *http.Response
-	rsp, err = c.client.Do(req)
+	rsp, err = s.client.Do(req)
 	if err != nil {
 		return
 	}
@@ -83,7 +78,7 @@ func (c *Service) GetConversationsReplies(token, channel, threadTS string) (resu
 }
 
 // https://api.slack.com/methods/users.list
-func (c *Service) GetUsersList(token string) (result UsersResponse, err error) {
+func (s *Service) GetUsersList(token string) (result UsersResponse, err error) {
 	url := fmt.Sprintf("%s/users.list?token=%s",
 		baseURL, token)
 
@@ -94,7 +89,7 @@ func (c *Service) GetUsersList(token string) (result UsersResponse, err error) {
 	}
 
 	var rsp *http.Response
-	rsp, err = c.client.Do(req)
+	rsp, err = s.client.Do(req)
 	if err != nil {
 		return
 	}
@@ -110,7 +105,7 @@ func (c *Service) GetUsersList(token string) (result UsersResponse, err error) {
 }
 
 // https://api.slack.com/interactivity/handling#message_responses
-func (c *Service) PostMessageByResponseURL(responseURL string, msgReq MessageRequestByResponseURL) error {
+func (s *Service) PostMessageByResponseURL(responseURL string, msgReq MessageRequestByResponseURL) error {
 	body, err := json.Marshal(msgReq)
 	if err != nil {
 		return err
@@ -121,13 +116,31 @@ func (c *Service) PostMessageByResponseURL(responseURL string, msgReq MessageReq
 		return err
 	}
 
-	rsp, err := c.client.Do(req)
+	rsp, err := s.client.Do(req)
 	if err != nil {
 		return err
 	}
 
 	body, err = ioutil.ReadAll(rsp.Body)
 	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Service) Do(req *http.Request, result interface{}) error {
+	rsp, err := s.client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	body, err := ioutil.ReadAll(rsp.Body)
+	if err != nil {
+		return err
+	}
+
+	if err = json.Unmarshal(body, result); err != nil {
 		return err
 	}
 
