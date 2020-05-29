@@ -29,7 +29,7 @@ func AddParams(originalURL string, params ...Param) (string, error) {
 	return u.String(), nil
 }
 
-func DoRequest(client *http.Client, req *http.Request, result interface{}) error {
+func DoRequestWithResult(client *http.Client, req *http.Request, result interface{}) error {
 	rsp, err := client.Do(req)
 	if err != nil {
 		return err

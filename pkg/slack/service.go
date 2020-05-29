@@ -48,7 +48,7 @@ func (s *Service) GetConversationsHistory(token, channel, cursor string) (result
 		return
 	}
 
-	err = httpwrap.DoRequest(s.client, req, &result)
+	err = httpwrap.DoRequestWithResult(s.client, req, &result)
 	return
 }
 
@@ -76,7 +76,7 @@ func (s *Service) GetConversationsReplies(token, channel, threadTS string) (resu
 		return
 	}
 
-	err = httpwrap.DoRequest(s.client, req, &result)
+	err = httpwrap.DoRequestWithResult(s.client, req, &result)
 	return
 }
 
@@ -96,7 +96,7 @@ func (s *Service) GetUsersList(token string) (result UsersResponse, err error) {
 		return
 	}
 
-	err = httpwrap.DoRequest(s.client, req, &result)
+	err = httpwrap.DoRequestWithResult(s.client, req, &result)
 	return
 }
 
