@@ -2,10 +2,10 @@ package slack
 
 import (
 	"bytes"
+	"collector/pkg/httpwrap"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -13,6 +13,7 @@ const (
 	baseURL                  = "https://slack.com/api"
 	conversationsHistoryPath = "/conversations.history"
 	conversationsRepliesPath = "/conversations.replies"
+	usersListPath            = "/users.list"
 )
 
 type Service struct {
@@ -27,19 +28,28 @@ func NewService() *Service {
 
 // https://api.slack.com/methods/conversations.history
 func (s *Service) GetConversationsHistory(token, channel, cursor string) (result MessagesResponse, err error) {
-	url := fmt.Sprintf("%s%s?token=%s&channel=%s",
-		baseURL, conversationsHistoryPath, token, channel)
-	if cursor != "" {
-		url += fmt.Sprintf("&cursor=%s", cursor)
-	}
+	var urlWithParams string
+	urlWithParams, err = httpwrap.AddParams(baseURL+conversationsHistoryPath,
+		httpwrap.Param{
+			Name:  "token",
+			Value: token,
+		},
+		httpwrap.Param{
+			Name:  "channel",
+			Value: channel,
+		},
+		httpwrap.Param{
+			Name:  "cursor",
+			Value: cursor,
+		})
 
 	var req *http.Request
-	req, err = http.NewRequest(http.MethodGet, url, nil)
+	req, err = http.NewRequest(http.MethodGet, urlWithParams, nil)
 	if err != nil {
 		return
 	}
 
-	err = s.Do(req, &result)
+	err = httpwrap.DoRequest(s.client, req, &result)
 	return
 }
 
@@ -54,14 +64,14 @@ func (s *Service) GetConversationsReplies(token, channel, threadTS string) (resu
 		return
 	}
 
-	err = s.Do(req, &result)
+	err = httpwrap.DoRequest(s.client, req, &result)
 	return
 }
 
 // https://api.slack.com/methods/users.list
 func (s *Service) GetUsersList(token string) (result UsersResponse, err error) {
-	url := fmt.Sprintf("%s/users.list?token=%s",
-		baseURL, token)
+	url := fmt.Sprintf("%s%s?token=%s",
+		baseURL, usersListPath, token)
 
 	var req *http.Request
 	req, err = http.NewRequest(http.MethodGet, url, nil)
@@ -104,27 +114,6 @@ func (s *Service) PostMessageByResponseURL(responseURL string, msgReq MessageReq
 
 	body, err = ioutil.ReadAll(rsp.Body)
 	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *Service) Do(req *http.Request, result interface{}) error {
-	rsp, err := s.client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer rsp.Body.Close()
-
-	body, err := ioutil.ReadAll(rsp.Body)
-	if err != nil {
-		return err
-	}
-
-	log.Printf("XXX %s", string(body))
-
-	if err = json.Unmarshal(body, result); err != nil {
 		return err
 	}
 
