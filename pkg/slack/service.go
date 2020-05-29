@@ -10,7 +10,9 @@ import (
 )
 
 const (
-	baseURL = "https://slack.com/api"
+	baseURL                  = "https://slack.com/api"
+	conversationsHistoryPath = "/conversations.history"
+	conversationsRepliesPath = "/conversations.replies"
 )
 
 type Service struct {
@@ -25,8 +27,8 @@ func NewService() *Service {
 
 // https://api.slack.com/methods/conversations.history
 func (s *Service) GetConversationsHistory(token, channel, cursor string) (result MessagesResponse, err error) {
-	url := fmt.Sprintf("%s/conversations.history?token=%s&channel=%s",
-		baseURL, token, channel)
+	url := fmt.Sprintf("%s%s?token=%s&channel=%s",
+		baseURL, conversationsHistoryPath, token, channel)
 	if cursor != "" {
 		url += fmt.Sprintf("&cursor=%s", cursor)
 	}
@@ -43,8 +45,8 @@ func (s *Service) GetConversationsHistory(token, channel, cursor string) (result
 
 // https://api.slack.com/methods/conversations.replies
 func (s *Service) GetConversationsReplies(token, channel, threadTS string) (result MessagesResponse, err error) {
-	url := fmt.Sprintf("%s/conversations.replies?token=%s&channel=%s&ts=%s",
-		baseURL, token, channel, threadTS)
+	url := fmt.Sprintf("%s%s?token=%s&channel=%s&ts=%s",
+		baseURL, conversationsRepliesPath, token, channel, threadTS)
 
 	var req *http.Request
 	req, err = http.NewRequest(http.MethodGet, url, nil)
@@ -52,19 +54,7 @@ func (s *Service) GetConversationsReplies(token, channel, threadTS string) (resu
 		return
 	}
 
-	var rsp *http.Response
-	rsp, err = s.client.Do(req)
-	if err != nil {
-		return
-	}
-
-	var body []byte
-	body, err = ioutil.ReadAll(rsp.Body)
-	if err != nil {
-		return
-	}
-
-	err = json.Unmarshal(body, &result)
+	err = s.Do(req, &result)
 	return
 }
 
