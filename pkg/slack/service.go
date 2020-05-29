@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"collector/pkg/httpwrap"
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -41,7 +39,8 @@ func (s *Service) GetConversationsHistory(token, channel, cursor string) (result
 		httpwrap.Param{
 			Name:  "cursor",
 			Value: cursor,
-		})
+		},
+	)
 
 	var req *http.Request
 	req, err = http.NewRequest(http.MethodGet, urlWithParams, nil)
@@ -55,11 +54,24 @@ func (s *Service) GetConversationsHistory(token, channel, cursor string) (result
 
 // https://api.slack.com/methods/conversations.replies
 func (s *Service) GetConversationsReplies(token, channel, threadTS string) (result MessagesResponse, err error) {
-	url := fmt.Sprintf("%s%s?token=%s&channel=%s&ts=%s",
-		baseURL, conversationsRepliesPath, token, channel, threadTS)
+	var urlWithParams string
+	urlWithParams, err = httpwrap.AddParams(baseURL+conversationsRepliesPath,
+		httpwrap.Param{
+			Name:  "token",
+			Value: token,
+		},
+		httpwrap.Param{
+			Name:  "channel",
+			Value: channel,
+		},
+		httpwrap.Param{
+			Name:  "ts",
+			Value: threadTS,
+		},
+	)
 
 	var req *http.Request
-	req, err = http.NewRequest(http.MethodGet, url, nil)
+	req, err = http.NewRequest(http.MethodGet, urlWithParams, nil)
 	if err != nil {
 		return
 	}
@@ -70,28 +82,21 @@ func (s *Service) GetConversationsReplies(token, channel, threadTS string) (resu
 
 // https://api.slack.com/methods/users.list
 func (s *Service) GetUsersList(token string) (result UsersResponse, err error) {
-	url := fmt.Sprintf("%s%s?token=%s",
-		baseURL, usersListPath, token)
+	var urlWithParams string
+	urlWithParams, err = httpwrap.AddParams(baseURL+usersListPath,
+		httpwrap.Param{
+			Name:  "token",
+			Value: token,
+		},
+	)
 
 	var req *http.Request
-	req, err = http.NewRequest(http.MethodGet, url, nil)
+	req, err = http.NewRequest(http.MethodGet, urlWithParams, nil)
 	if err != nil {
 		return
 	}
 
-	var rsp *http.Response
-	rsp, err = s.client.Do(req)
-	if err != nil {
-		return
-	}
-
-	var body []byte
-	body, err = ioutil.ReadAll(rsp.Body)
-	if err != nil {
-		return
-	}
-
-	err = json.Unmarshal(body, &result)
+	err = httpwrap.DoRequest(s.client, req, &result)
 	return
 }
 
@@ -107,12 +112,7 @@ func (s *Service) PostMessageByResponseURL(responseURL string, msgReq MessageReq
 		return err
 	}
 
-	rsp, err := s.client.Do(req)
-	if err != nil {
-		return err
-	}
-
-	body, err = ioutil.ReadAll(rsp.Body)
+	_, err = s.client.Do(req)
 	if err != nil {
 		return err
 	}
