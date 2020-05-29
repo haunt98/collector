@@ -134,6 +134,7 @@ func (s *Service) Do(req *http.Request, result interface{}) error {
 	if err != nil {
 		return err
 	}
+	defer rsp.Body.Close()
 
 	body, err := ioutil.ReadAll(rsp.Body)
 	if err != nil {
