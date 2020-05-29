@@ -25,7 +25,7 @@ func NewService() *Service {
 
 // https://api.slack.com/methods/conversations.history
 func (s *Service) GetConversationsHistory(token, channel, cursor string) (result MessagesResponse, err error) {
-	url := fmt.Sprintf("%s/conversations.replies?token=%s&channel=%s",
+	url := fmt.Sprintf("%s/conversations.history?token=%s&channel=%s",
 		baseURL, token, channel)
 	if cursor != "" {
 		url += fmt.Sprintf("&cursor=%s", cursor)
