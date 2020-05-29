@@ -37,7 +37,7 @@ func (c *Service) GetConversationsHistory(token, channel, cursor string) (result
 	log.Println(cursor)
 
 	resultPointer := new(MessagesResponse)
-	_, err = sling.New().Get(baseURL + "/conversations.history").
+	rsp, err := sling.New().Get(baseURL + "/conversations.history").
 		QueryStruct(Params{
 			Token:   token,
 			Channel: channel,
@@ -49,6 +49,7 @@ func (c *Service) GetConversationsHistory(token, channel, cursor string) (result
 	}
 
 	log.Printf("XXX %+v\n", resultPointer)
+	log.Printf("YYY %+v\n", rsp)
 
 	result = *resultPointer
 	return
