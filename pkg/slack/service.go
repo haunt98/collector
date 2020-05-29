@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/dghubble/sling"
@@ -32,6 +33,9 @@ func (c *Service) GetConversationsHistory(token, channel, cursor string) (result
 		Cursor  string `json:"cursor,omitempty"`
 	}
 
+	log.Println(channel)
+	log.Println(cursor)
+
 	resultPointer := new(MessagesResponse)
 	_, err = sling.New().Get(baseURL + "/conversations.history").
 		QueryStruct(Params{
@@ -43,6 +47,8 @@ func (c *Service) GetConversationsHistory(token, channel, cursor string) (result
 	if err != nil {
 		return
 	}
+
+	log.Printf("XXX %+v\n", resultPointer)
 
 	result = *resultPointer
 	return
