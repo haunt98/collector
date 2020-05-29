@@ -6,6 +6,7 @@ module collector
 go 1.14
 
 require (
+	github.com/dghubble/sling v1.3.0
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.3.0 // indirect
 	github.com/golang/protobuf v1.4.2 // indirect
@@ -13,5 +14,6 @@ require (
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/stretchr/testify v1.5.1
 	golang.org/x/sys v0.0.0-20200523222454-059865788121 // indirect
+	google.golang.org/protobuf v1.24.0 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 )

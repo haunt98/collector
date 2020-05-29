@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/dghubble/sling"
 )
 
 type Service struct {
@@ -24,31 +26,25 @@ const (
 
 // https://api.slack.com/methods/conversations.history
 func (c *Service) GetConversationsHistory(token, channel, cursor string) (result MessagesResponse, err error) {
-	url := fmt.Sprintf("%s/conversations.history?token=%s&channel=%s",
-		baseURL, token, channel)
-	if cursor == "" {
-		url += fmt.Sprintf("&cursor=%s", cursor)
+	type Params struct {
+		Token   string `json:"token,omitempty"`
+		Channel string `json:"channel,omitempty"`
+		Cursor  string `json:"cursor,omitempty"`
 	}
 
-	var req *http.Request
-	req, err = http.NewRequest(http.MethodGet, url, nil)
+	resultPointer := new(MessagesResponse)
+	_, err = sling.New().Get(baseURL + "/conversations.history").
+		QueryStruct(Params{
+			Token:   token,
+			Channel: channel,
+			Cursor:  cursor,
+		}).
+		ReceiveSuccess(resultPointer)
 	if err != nil {
 		return
 	}
 
-	var rsp *http.Response
-	rsp, err = c.client.Do(req)
-	if err != nil {
-		return
-	}
-
-	var body []byte
-	body, err = ioutil.ReadAll(rsp.Body)
-	if err != nil {
-		return
-	}
-
-	err = json.Unmarshal(body, &result)
+	result = *resultPointer
 	return
 }
 
