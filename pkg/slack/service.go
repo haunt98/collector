@@ -35,7 +35,7 @@ func (s *Service) GetConversationsHistory(token, channel, cursor string) (result
 	}
 
 	var req *http.Request
-	req, err = s.sl.Get("/conversations.history").
+	req, err = s.sl.New().Get("/conversations.history").
 		QueryStruct(Params{
 			Token:   token,
 			Channel: channel,
