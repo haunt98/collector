@@ -7,8 +7,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-
-	"github.com/dghubble/sling"
 )
 
 const (
@@ -17,32 +15,24 @@ const (
 
 type Service struct {
 	client *http.Client
-	sl     *sling.Sling
 }
 
 func NewService() *Service {
 	return &Service{
 		client: &http.Client{},
-		sl:     sling.New().Base(baseURL),
 	}
 }
 
 // https://api.slack.com/methods/conversations.history
 func (s *Service) GetConversationsHistory(token, channel, cursor string) (result MessagesResponse, err error) {
-	type Params struct {
-		Token   string `json:"token,omitempty"`
-		Channel string `json:"channel,omitempty"`
-		Cursor  string `json:"cursor,omitempty"`
+	url := fmt.Sprintf("%s/conversations.replies?token=%s&channel=%s",
+		baseURL, token, channel)
+	if cursor != "" {
+		url += fmt.Sprintf("&cursor=%s", cursor)
 	}
 
 	var req *http.Request
-	req, err = sling.New().Get("https://slack.com/api/conversations.history").
-		QueryStruct(Params{
-			Token:   token,
-			Channel: channel,
-			Cursor:  cursor,
-		}).
-		Request()
+	req, err = http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return
 	}
