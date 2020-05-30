@@ -16,7 +16,7 @@ func TestAddParams(t *testing.T) {
 	}{
 		{
 			name:        "success",
-			originalURL: "https://www.google.com/",
+			originalURL: "https://www.google.com",
 			parans: []Param{
 				{
 					Name:  "a",
@@ -27,6 +27,8 @@ func TestAddParams(t *testing.T) {
 					Value: "2",
 				},
 			},
+			wantResult: "https://www.google.com?a=1&b=2",
+			wantError:  nil,
 		},
 	}
 
