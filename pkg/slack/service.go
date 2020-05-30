@@ -41,6 +41,9 @@ func (s *Service) GetConversationsHistory(token, channel, cursor string) (result
 			Value: cursor,
 		},
 	)
+	if err != nil {
+		return
+	}
 
 	var req *http.Request
 	req, err = http.NewRequest(http.MethodGet, urlWithParams, nil)
@@ -69,6 +72,9 @@ func (s *Service) GetConversationsReplies(token, channel, threadTS string) (resu
 			Value: threadTS,
 		},
 	)
+	if err != nil {
+		return
+	}
 
 	var req *http.Request
 	req, err = http.NewRequest(http.MethodGet, urlWithParams, nil)
@@ -89,6 +95,9 @@ func (s *Service) GetUsersList(token string) (result UsersResponse, err error) {
 			Value: token,
 		},
 	)
+	if err != nil {
+		return
+	}
 
 	var req *http.Request
 	req, err = http.NewRequest(http.MethodGet, urlWithParams, nil)
