@@ -19,7 +19,15 @@ jobs:
       uses: actions/setup-go@v2
 
     - name: Build
-      run: go build -v ./cmd/...
-
-    - name: Test
-      run: go test -v ./...
+      run: go build ./cmd/...
+  
+  test:
+    name: Test
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      
+      - name: Test
+        run: |
+          go test ./...
+          go test -race ./...
