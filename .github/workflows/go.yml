@@ -20,14 +20,11 @@ jobs:
 
     - name: Build
       run: go build ./cmd/...
+    
+    - name: Test
+      run: |
+        go test ./...
+        go test -race ./...
   
-  test:
-    name: Test
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      
-      - name: Test
-        run: |
-          go test ./...
-          go test -race ./...
+    - name: Run golangci-lint
+      uses: golangci/golangci-lint-action@v1
