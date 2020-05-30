@@ -6,33 +6,49 @@ on:
       - master
 
 jobs:
-
   build:
     name: Build
     runs-on: ubuntu-latest
     steps:
-  
-    - name: Checkout
-      uses: actions/checkout@v2
-    
-    - name: Setup Go environment
-      uses: actions/setup-go@v2
-    
-    - name: Restore cache
-      uses: actions/cache@v2
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
-    
-    - name: Build
-      run: go build ./cmd/...
-    
-    - name: Test
-      run: |
-        go test ./...
-        go test -race ./...
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v2
+
+      - name: Restore cache
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Build
+        run: go build ./cmd/...
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v2
+
+      - name: Restore cache
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Test
+        run: |
+          go test ./...
+          go test -race ./...
 
   golangci-lint:
     name: golangci-lint
@@ -40,7 +56,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      
+
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v1
         with:
