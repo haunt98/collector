@@ -68,4 +68,4 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: super-linter
-        uses: github/super-linter@v2
+        uses: github/super-linter@v2.0.0
