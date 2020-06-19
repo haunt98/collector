@@ -15,10 +15,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
       - name: Setup Go environment
         uses: actions/setup-go@v2
-
       - name: Restore cache
         uses: actions/cache@v2
         with:
@@ -26,7 +24,6 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-
       - name: Build
         run: go build ./cmd/...
 
@@ -39,10 +36,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
       - name: Setup Go environment
         uses: actions/setup-go@v2
-
       - name: Restore cache
         uses: actions/cache@v2
         with:
@@ -50,7 +45,6 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-
       - name: Test
         run: |
           go test ./...
@@ -62,8 +56,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v1
         with:
           version: v1.27
+
+  super-linter:
+    name: super-linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: super-linter
+        uses: github/super-linter@v2
