@@ -1,6 +1,7 @@
 package scrum
 
 import (
+	"collector/pkg/clock"
 	"collector/pkg/slack"
 	"log"
 	"net/http"
@@ -51,10 +52,15 @@ func (s *Service) HandlePost(ctx *gin.Context) {
 func (s *Service) handleCollect(ctx *gin.Context, payload slack.CommandPayload) {
 	// slack need response as soon as possible
 	ctx.String(http.StatusOK, "")
+	date, err := clock.NowDateInSaiGon()
+	if err != nil {
+		log.Fatal("failed to get date", err)
+	}
+	collectMessageWithDate := collectMessage + " " + date
 
 	if err := s.slackService.PostMessageByResponseURL(payload.ResponseURL, slack.MessageRequestByResponseURL{
 		MessagePayload: slack.MessagePayload{
-			Text:   collectMessage,
+			Text:   collectMessageWithDate,
 			Blocks: nil,
 		},
 		ResponseType: slack.ResponseTypeInChannel,
