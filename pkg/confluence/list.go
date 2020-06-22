@@ -29,11 +29,7 @@ func titleList(input string) string {
 		return input
 	}
 
-	replaceFn := func(s string) string {
-		return strings.ToUpper(s)
-	}
-
-	input = regex.ReplaceAllStringFunc(input, replaceFn)
+	input = regex.ReplaceAllStringFunc(input, strings.ToUpper)
 
 	return input
 }
