@@ -57,12 +57,3 @@ jobs:
         uses: golangci/golangci-lint-action@v1
         with:
           version: v1.27
-
-  super-linter:
-    name: super-linter
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: super-linter
-        uses: github/super-linter@v2.0.0
