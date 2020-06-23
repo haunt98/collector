@@ -5,6 +5,7 @@ import (
 	"collector/pkg/slack"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -74,6 +75,7 @@ func (s *Service) handleSummary(ctx *gin.Context, payload slack.CommandPayload) 
 	ctx.String(http.StatusOK, "")
 
 	botMsg := s.loopGetHistoryUntil(payload.ChannelID, maxLoop)
+	date := strings.TrimPrefix(botMsg.Text, collectMessage)
 
 	humanSummary, confluenceSummary, err := s.composeThreadSummary(payload.ChannelID, botMsg.TS)
 	if err != nil {
@@ -83,7 +85,7 @@ func (s *Service) handleSummary(ctx *gin.Context, payload slack.CommandPayload) 
 	// human
 	if err := s.slackService.PostMessageByResponseURL(payload.ResponseURL, slack.MessageRequestByResponseURL{
 		MessagePayload: slack.MessagePayload{
-			Text:   humanMessageIntro,
+			Text:   humanMessageIntro + date,
 			Blocks: humanSummary,
 		},
 		ResponseType: slack.ResponseTypeInChannel,
@@ -132,7 +134,7 @@ func (s *Service) loopGetHistoryUntil(channel string, max int) (result slack.Mes
 		}
 
 		for _, msg := range conversationHistory.Messages {
-			if msg.Type == slack.TypeMessage && msg.Text == collectMessage && msg.BotID == s.botID {
+			if msg.Type == slack.TypeMessage && isCollectMessage(msg.Text) && msg.BotID == s.botID {
 				result = msg
 				return
 			}
@@ -141,4 +143,8 @@ func (s *Service) loopGetHistoryUntil(channel string, max int) (result slack.Mes
 		cursor = conversationHistory.ResponseMetadata.NextCursor
 	}
 	return
+}
+
+func isCollectMessage(text string) bool {
+	return strings.HasPrefix(text, collectMessage)
 }
